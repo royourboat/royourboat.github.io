@@ -3,4 +3,10 @@
 !.gitignore
 !.nojekyll
 !docs/
-
+!docs/*
+!docs/*
+!docs/*/*
+!docs/*/*/*
+!docs/*/*/*/*
+!docs/*/*/*/*/*
+!docs/*/*/*/*/*/*

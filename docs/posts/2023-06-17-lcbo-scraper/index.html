@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.433">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Stephen Ro">
+<meta name="dcterms.date" content="2023-06-17">
+<meta name="description" content="Learn how to find and download data products from the LCBO webpage.">
+
+<title>Stephen Ro - Scraping LCBO Data (Part 3: Product Descriptions)</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Stephen Ro</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html" rel="" target="">
+ <span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../about.html" rel="" target="">
+ <span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../posts.html" rel="" target="">
+ <span class="menu-text">Blog</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../resume/stephen_ro_resume.pdf" rel="" target="">
+ <span class="menu-text">Resume</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/royourboat" rel="" target=""><i class="bi bi-github" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://www.linkedin.com/in/stephenro/" rel="" target=""><i class="bi bi-linkedin" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="mailto:stephensro@gmail.com" rel="" target=""><i class="bi bi-envelope" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+</ul>
+            <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Scraping LCBO Data (Part 3: Product Descriptions)</h1>
+                  <div>
+        <div class="description">
+          Learn how to find and download data products from the LCBO webpage.
+        </div>
+      </div>
+                          <div class="quarto-categories">
+                <div class="quarto-category">Python</div>
+                <div class="quarto-category">HTML</div>
+                <div class="quarto-category">bash</div>
+                <div class="quarto-category">JSON</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p><a href="https://royourboat.github.io/">Stephen Ro</a> </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">June 17, 2023</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#first-strategy-chase-low-hanging-fruit" id="toc-first-strategy-chase-low-hanging-fruit" class="nav-link active" data-scroll-target="#first-strategy-chase-low-hanging-fruit">First strategy: chase low hanging fruit</a>
+  <ul class="collapse">
+  <li><a href="#brute-forcing-strategy" id="toc-brute-forcing-strategy" class="nav-link" data-scroll-target="#brute-forcing-strategy">Brute-forcing strategy:</a></li>
+  <li><a href="#pros-cons" id="toc-pros-cons" class="nav-link" data-scroll-target="#pros-cons">Pros &amp; Cons</a></li>
+  </ul></li>
+  <li><a href="#second-strategy-less-is-more" id="toc-second-strategy-less-is-more" class="nav-link" data-scroll-target="#second-strategy-less-is-more">Second strategy: “less is more”</a>
+  <ul class="collapse">
+  <li><a href="#query-strategy" id="toc-query-strategy" class="nav-link" data-scroll-target="#query-strategy">Query strategy:</a>
+  <ul class="collapse">
+  <li><a href="#part-1-finding-the-data" id="toc-part-1-finding-the-data" class="nav-link" data-scroll-target="#part-1-finding-the-data">Part 1: Finding the data</a></li>
+  <li><a href="#part-2-requesting-the-data" id="toc-part-2-requesting-the-data" class="nav-link" data-scroll-target="#part-2-requesting-the-data">Part 2: Requesting the data</a></li>
+  <li><a href="#part-3-collecting-all-the-data" id="toc-part-3-collecting-all-the-data" class="nav-link" data-scroll-target="#part-3-collecting-all-the-data">Part 3: Collecting all the data</a></li>
+  </ul></li>
+  <li><a href="#pros-cons-1" id="toc-pros-cons-1" class="nav-link" data-scroll-target="#pros-cons-1">Pros &amp; Cons</a></li>
+  <li><a href="#data-product-summary" id="toc-data-product-summary" class="nav-link" data-scroll-target="#data-product-summary">Data product summary</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block page-columns page-full" id="quarto-document-content">
+
+
+
+
+<p>Designing a web-scraping strategy depends on your constraints (e.g.,deadlines, uncertainties, awareness), objectives (e.g., features, speed, reproducability), and experience! In this post, I talk about my experience of trying two different strategies to collect the product description data. Trying both strategies revealed valuable insights into the strengths and weaknesses of each. I share these insights below.</p>
+<section id="first-strategy-chase-low-hanging-fruit" class="level1 page-columns page-full">
+<h1>First strategy: chase low hanging fruit</h1>
+<p>The minimum viable features I need for my app are simple: the product name, price, and SKU number. Everything else is a bonus! But, the bonuses looks really nice though… Have a look at the sample product page:</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Sample product page
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="lcbo_product.png" class="img-fluid figure-img" style="width:100.0%"></p>
+<figcaption class="figure-caption">Jackson-Triggs Cabernet Sauvignon <a href="https://www.lcbo.com/en/jackson-triggs-cabernet-sauvignon-328534">https://www.lcbo.com/en/jackson-triggs-cabernet-sauvignon-328534</a></figcaption>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<p>The product page contains many features such as the description, ABV, sugar content, bottle volume, and sale price. My greed for obtaining “all” features in case of some unforeseen reasons led me to fixate on the product page and ignore the search for any other viable (and better) solutions. It was a great learning experience that helps me better identify what is the best web scraping strategy and why.</p>
+
+<div class="no-row-height column-margin column-container"><div class="">
+<p><img src="candy.jpg" class="img-fluid" style="width:100.0%"></p>
+</div></div><section id="brute-forcing-strategy" class="level2">
+<h2 class="anchored" data-anchor-id="brute-forcing-strategy">Brute-forcing strategy:</h2>
+<p>I noticed the product page contains a link “Check Availability in All Stores” that sends you to a well organized inventory page for this bottle! (We will get back to this inventory data later.) The inventory page has a “View Details” button that sends you back to the product page.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Sample inventory page
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="lcbo_inventory.png" class="img-fluid figure-img" style="width:100.0%"></p>
+<figcaption class="figure-caption"><a href="https://www.lcbo.com/en/storeinventory/?sku=328534">Inventory for Jackson-Triggs Cabernet Sauvignon</a></figcaption>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<p>Unlike the product page URL, the product inventory URL is structured simply as <a href="https://www.lcbo.com/en/storeinventory/?sku=32853">https://www.lcbo.com/en/storeinventory/?sku=32853</a>. It looks like I can query inventory pages by selecting SKU numbers. If I have the SKU number then I can use the URL behind the “View Details” button to get the product descriptions URL. From there, I can use the techniques in Part 1 of the blog series to obtain JSON data containing product descriptions.</p>
+<p>This technique works. The solution is a minor adaptation to the script shown in Part 1 of the blog series. I found approximately 13,000 SKU numbers have products associated with them. <strong>However</strong>, this brute-force approach took several days to perform. The reason is LCBO’s SKU number is up to 6 digits long which has 1 million possible combinations. So, only 1.3% of the requests were successful.</p>
+</section>
+<section id="pros-cons" class="level2">
+<h2 class="anchored" data-anchor-id="pros-cons">Pros &amp; Cons</h2>
+<p>This strategy feels quite embarassing to share. But, its valuable to make a poorly performing but “successful” solution. It made me appreciate how thoughtful and clever web scraping can be. A few small mistakes or accounting errors can lead to restarting the entire scraping process. Even worse is to patch together two poorly executed scraping results and hope things are okay. The frustrations compel me to consider more than one solution before deciding to commit and build.</p>
+<p>Here are my observations of the pros and cons for brute-forcing.</p>
+<section id="pros-to-brute-forcing" class="level4">
+<h4 class="anchored" data-anchor-id="pros-to-brute-forcing">Pros to brute-forcing</h4>
+<ul>
+<li>Easy to implement</li>
+<li>Easy to debug</li>
+<li>Can do other work while waiting</li>
+<li>Feels like you are working</li>
+</ul>
+</section>
+<section id="cons-to-brute-forcing" class="level4">
+<h4 class="anchored" data-anchor-id="cons-to-brute-forcing">Cons to brute-forcing</h4>
+<ul>
+<li>Extremely slow and inefficient</li>
+<li>Vulnerable to computer and network instabilities</li>
+<li>Requires babysitting</li>
+<li>Requires two steps (product inventory -&gt; product page)</li>
+<li>Very likely to have IP banned</li>
+<li>Suspicious and straining to servers</li>
+<li>Generates enormous inertia to run again</li>
+<li>Gives a false impression that you are working</li>
+</ul>
+</section>
+</section>
+</section>
+<section id="second-strategy-less-is-more" class="level1">
+<h1>Second strategy: “less is more”</h1>
+<p>One of the best surprises in web scraping is finding a data product with features you were not expecting. Sometimes this can be a LOT of features! It feels like opening a loot box full of data goodies! I suspect this is common practice since re-engineering data products takes careful work and risks breaking everything. So, it is less risky to just send more than minimally required for future developer.</p>
+<p>I did not know this! As a result, I ignored LCBO’s query page because it appeared to <em>only</em> provided the product name, price, and ratings (see sample image below). That was a costly mistake!</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-3-contents" aria-controls="callout-3" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+LCBO query page
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-3" class="callout-3-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p><img src="lcbo_query.png" class="img-fluid" style="width:100.0%"></p>
+</div>
+</div>
+</div>
+<p>It was not too costly considering that my first strategy was so slow that I could explore other strategies. Under tighter constraints or stress, I may have not done this, which is good to be aware of.</p>
+<section id="query-strategy" class="level2">
+<h2 class="anchored" data-anchor-id="query-strategy">Query strategy:</h2>
+<section id="part-1-finding-the-data" class="level3">
+<h3 class="anchored" data-anchor-id="part-1-finding-the-data">Part 1: Finding the data</h3>
+<p>Using the techniques in Part 1 of the blog series, I found a relatively large JSON file is transferred when querying the LCBO product list. See the image below.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+JSON for product exploration page
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-4" class="callout-4-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p><img src="lcbo_inspect_json.png" class="img-fluid" style="width:100.0%"></p>
+</div>
+</div>
+</div>
+<p>The primary variables we care about are the first and last variables, “totalCount” and “results”.</p>
+<p>“totalCount” is the number of products resulting from my query. Since the query had no filters, there were 13,186 results products to be found.</p>
+<p>“results” is the list of wine products on display. It contains all of the product descriptions we are interested in and more. There is a LOT of data here that we can unpack. Here are some snapshots for one product:</p>
+<ul>
+<li><a href="redwine1.png">JSON part 1</a></li>
+<li><a href="redwine2.png">JSON part 2</a></li>
+<li><a href="redwine3.png">JSON part 3</a>.</li>
+</ul>
+</section>
+<section id="part-2-requesting-the-data" class="level3">
+<h3 class="anchored" data-anchor-id="part-2-requesting-the-data">Part 2: Requesting the data</h3>
+<p>This is where things become a little tricky. In Part 1, we found the cURL command to request store information data. The command had a single integer as an argument corresponding to the store ID. Here, we will have several parameters due to the numerous filters available. The parameters also contain hidden limits. For example, I cannot simply request a single JSON with 13,186 products (I tried, of course). As a result, we need to procede carefully with designing a scraping strategy.</p>
+<p>After importing the cURL command in Postman, this is what I see:</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+JSON for product exploration page
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-5" class="callout-5-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p><img src="postman_start.png" class="img-fluid" style="width:100.0%"></p>
+</div>
+</div>
+</div>
+<p>The code snippet on the right is this:</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-6-contents" aria-controls="callout-6" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+cURL command
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-6" class="callout-6-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>curl –location ‘https://platform.cloud.coveo.com/rest/search/v2?organizationId=lcboproductionx2kwygnc’<br>
+–header ‘User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/114.0’<br>
+–header ‘Accept: <em>/</em>’<br>
+–header ‘Accept-Language: en-CA,en-US;q=0.7,en;q=0.3’<br>
+–header ‘Accept-Encoding: gzip, deflate, br’<br>
+–header ‘Authorization: Bearer xx883b5583-07fb-416b-874b-77cce565d927’<br>
+–header ‘Content-Type: application/x-www-form-urlencoded; charset=UTF-8’<br>
+–header ‘Origin: https://www.lcbo.com’<br>
+–header ‘DNT: 1’<br>
+–header ‘Connection: keep-alive’<br>
+–header ‘Referer: https://www.lcbo.com/’<br>
+–header ‘Sec-Fetch-Dest: empty’<br>
+–header ‘Sec-Fetch-Mode: cors’<br>
+–header ‘Sec-Fetch-Site: cross-site’<br>
+–data ‘actionsHistory=%5B%5D&amp;referrer=&amp;analytics=%7B%22clientId%22%3A%22%22%2C%22documentLocation%22%3A%22https%3A%2F%2Fwww.lcbo.com%2Fen%2Fproducts%23t%3Dclp-products%26sort%3Drelevancy%26layout%3Dcard%22%2C%22documentReferrer%22%3A%22%22%2C%22pageId%22%3A%22%22%7D&amp;isGuestUser=false&amp;aq=%40ec_category%3D%3DProducts&amp;searchHub=Web_Listing_EN&amp;tab=clp-products&amp;locale=en&amp;firstResult=0&amp;numberOfResults=48&amp;excerptLength=200&amp;enableDidYouMean=true&amp;sortCriteria=relevancy&amp;queryFunctions=%5B%5D&amp;rankingFunctions=%5B%5D&amp;groupBy=%5B%7B%22field%22%3A%22%40lcbo_bintag_wine_sweetness%22%2C%22injectionDepth%22%3A10000%2C%22computedFields%22%3A%5B%7B%22field%22%3A%22%40lcbo_bintag_wine_sweetness%22%2C%22operation%22%3A%22minimum%22%7D%2C%7B%22field%22%3A%22%40lcbo_bintag_wine_sweetness%22%2C%22operation%22%3A%22maximum%22%7D%5D%2C%22maximumNumberOfValues%22%3A1%7D%2C%7B%22field%22%3A%22%40lcbo_bintag_wine_body%22%2C%22injectionDepth%22%3A10000%2C%22computedFields%22%3A%5B%7B%22field%22%3A%22%40lcbo_bintag_wine_body%22%2C%22operation%22%3A%22minimum%22%7D%2C%7B%22field%22%3A%22%40lcbo_bintag_wine_body%22%2C%22operation%22%3A%22maximum%22%7D%5D%2C%22maximumNumberOfValues%22%3A1%7D%2C%7B%22field%22%3A%22%40lcbo_bintag_wine_flavor_intensity%22%2C%22injectionDepth%22%3A10000%2C%22computedFields%22%3A%5B%7B%22field%22%3A%22%40lcbo_bintag_wine_flavor_intensity%22%2C%22operation%22%3A%22minimum%22%7D%2C%7B%22field%22%3A%22%40lcbo_bintag_wine_flavor_intensity%22%2C%22operation%22%3A%22maximum%22%7D%5D%2C%22maximumNumberOfValues%22%3A1%7D%2C%7B%22field%22%3A%22%40lcbo_bintag_wine_acidity%22%2C%22injectionDepth%22%3A10000%2C%22computedFields%22%3A%5B%7B%22field%22%3A%22%40lcbo_bintag_wine_acidity%22%2C%22operation%22%3A%22minimum%22%7D%2C%7B%22field%22%3A%22%40lcbo_bintag_wine_acidity%22%2C%22operation%22%3A%22maximum%22%7D%5D%2C%22maximumNumberOfValues%22%3A1%7D%2C%7B%22field%22%3A%22%40lcbo_bintag_wine_tannins%22%2C%22injectionDepth%22%3A10000%2C%22computedFields%22%3A%5B%7B%22field%22%3A%22%40lcbo_bintag_wine_tannins%22%2C%22operation%22%3A%22minimum%22%7D%2C%7B%22field%22%3A%22%40lcbo_bintag_wine_tannins%22%2C%22operation%22%3A%22maximum%22%7D%5D%2C%22maximumNumberOfValues%22%3A1%7D%2C%7B%22field%22%3A%22%40ec_price%22%2C%22injectionDepth%22%3A10000%2C%22computedFields%22%3A%5B%7B%22field%22%3A%22%40ec_price%22%2C%22operation%22%3A%22minimum%22%7D%2C%7B%22field%22%3A%22%40ec_price%22%2C%22operation%22%3A%22maximum%22%7D%5D%2C%22maximumNumberOfValues%22%3A1%7D%2C%7B%22field%22%3A%22%40lcbo_total_volume%22%2C%22injectionDepth%22%3A10000%2C%22computedFields%22%3A%5B%7B%22field%22%3A%22%40lcbo_total_volume%22%2C%22operation%22%3A%22minimum%22%7D%2C%7B%22field%22%3A%22%40lcbo_total_volume%22%2C%22operation%22%3A%22maximum%22%7D%5D%2C%22maximumNumberOfValues%22%3A1%7D%2C%7B%22field%22%3A%22%40lcbo_alcohol_percent%22%2C%22injectionDepth%22%3A10000%2C%22computedFields%22%3A%5B%7B%22field%22%3A%22%40lcbo_alcohol_percent%22%2C%22operation%22%3A%22minimum%22%7D%2C%7B%22field%22%3A%22%40lcbo_alcohol_percent%22%2C%22operation%22%3A%22maximum%22%7D%5D%2C%22maximumNumberOfValues%22%3A1%7D%2C%7B%22field%22%3A%22%40lcbo_sugar_gm_per_ltr%22%2C%22injectionDepth%22%3A10000%2C%22computedFields%22%3A%5B%7B%22field%22%3A%22%40lcbo_sugar_gm_per_ltr%22%2C%22operation%22%3A%22minimum%22%7D%2C%7B%22field%22%3A%22%40lcbo_sugar_gm_per_ltr%22%2C%22operation%22%3A%22maximum%22%7D%5D%2C%22maximumNumberOfValues%22%3A1%7D%5D&amp;facets=%5B%7B%22facetId%22%3A%22%40ec_category%22%2C%22field%22%3A%22ec_category%22%2C%22type%22%3A%22hierarchical%22%2C%22injectionDepth%22%3A1000%2C%22delimitingCharacter%22%3A%22%7C%22%2C%22filterFacetCount%22%3Atrue%2C%22basePath%22%3A%5B%22Products%22%5D%2C%22filterByBasePath%22%3Afalse%2C%22currentValues%22%3A%5B%5D%2C%22preventAutoSelect%22%3Afalse%2C%22numberOfValues%22%3A5%2C%22isFieldExpanded%22%3Afalse%7D%2C%7B%22facetId%22%3A%22%40lcbo_varietal_name%22%2C%22field%22%3A%22lcbo_varietal_name%22%2C%22type%22%3A%22specific%22%2C%22sortCriteria%22%3A%22occurrences%22%2C%22injectionDepth%22%3A1000%2C%22filterFacetCount%22%3Atrue%2C%22currentValues%22%3A%5B%5D%2C%22numberOfValues%22%3A5%2C%22freezeCurrentValues%22%3Afalse%2C%22preventAutoSelect%22%3Afalse%2C%22isFieldExpanded%22%3Afalse%7D%2C%7B%22facetId%22%3A%22%40lcbo_vqa_code%22%2C%22field%22%3A%22lcbo_vqa_code%22%2C%22type%22%3A%22specific%22%2C%22injectionDepth%22%3A1000%2C%22filterFacetCount%22%3Atrue%2C%22currentValues%22%3A%5B%5D%2C%22numberOfValues%22%3A8%2C%22freezeCurrentValues%22%3Afalse%2C%22preventAutoSelect%22%3Afalse%2C%22isFieldExpanded%22%3Afalse%7D%2C%7B%22facetId%22%3A%22%40country_of_manufacture%22%2C%22field%22%3A%22country_of_manufacture%22%2C%22type%22%3A%22specific%22%2C%22sortCriteria%22%3A%22occurrences%22%2C%22injectionDepth%22%3A1000%2C%22filterFacetCount%22%3Atrue%2C%22currentValues%22%3A%5B%5D%2C%22numberOfValues%22%3A5%2C%22freezeCurrentValues%22%3Afalse%2C%22preventAutoSelect%22%3Afalse%2C%22isFieldExpanded%22%3Afalse%7D%2C%7B%22facetId%22%3A%22%40lcbo_region_name%22%2C%22field%22%3A%22lcbo_region_name%22%2C%22type%22%3A%22specific%22%2C%22sortCriteria%22%3A%22occurrences%22%2C%22injectionDepth%22%3A1000%2C%22filterFacetCount%22%3Atrue%2C%22currentValues%22%3A%5B%5D%2C%22numberOfValues%22%3A5%2C%22freezeCurrentValues%22%3Afalse%2C%22preventAutoSelect%22%3Afalse%2C%22isFieldExpanded%22%3Afalse%7D%2C%7B%22facetId%22%3A%22%40lcbo_program%22%2C%22field%22%3A%22lcbo_program%22%2C%22type%22%3A%22specific%22%2C%22sortCriteria%22%3A%22occurrences%22%2C%22injectionDepth%22%3A1000%2C%22filterFacetCount%22%3Atrue%2C%22currentValues%22%3A%5B%5D%2C%22numberOfValues%22%3A5%2C%22freezeCurrentValues%22%3Afalse%2C%22preventAutoSelect%22%3Afalse%2C%22isFieldExpanded%22%3Afalse%7D%2C%7B%22facetId%22%3A%22%40lcbo_current_offer%22%2C%22field%22%3A%22lcbo_current_offer%22%2C%22type%22%3A%22specific%22%2C%22sortCriteria%22%3A%22occurrences%22%2C%22injectionDepth%22%3A1000%2C%22filterFacetCount%22%3Atrue%2C%22currentValues%22%3A%5B%5D%2C%22numberOfValues%22%3A8%2C%22freezeCurrentValues%22%3Afalse%2C%22preventAutoSelect%22%3Afalse%2C%22isFieldExpanded%22%3Afalse%7D%2C%7B%22facetId%22%3A%22%40stores_stock%22%2C%22field%22%3A%22stores_stock%22%2C%22type%22%3A%22specific%22%2C%22injectionDepth%22%3A1000%2C%22filterFacetCount%22%3Atrue%2C%22currentValues%22%3A%5B%5D%2C%22numberOfValues%22%3A8%2C%22freezeCurrentValues%22%3Afalse%2C%22preventAutoSelect%22%3Afalse%2C%22isFieldExpanded%22%3Afalse%7D%2C%7B%22facetId%22%3A%22%40ec_rating%22%2C%22field%22%3A%22ec_rating%22%2C%22type%22%3A%22numericalRange%22%2C%22sortCriteria%22%3A%22descending%22%2C%22injectionDepth%22%3A1000%2C%22filterFacetCount%22%3Atrue%2C%22currentValues%22%3A%5B%7B%22start%22%3A1%2C%22end%22%3A1.9%2C%22endInclusive%22%3Atrue%2C%22state%22%3A%22idle%22%7D%2C%7B%22start%22%3A2%2C%22end%22%3A2.9%2C%22endInclusive%22%3Atrue%2C%22state%22%3A%22idle%22%7D%2C%7B%22start%22%3A3%2C%22end%22%3A3.9%2C%22endInclusive%22%3Atrue%2C%22state%22%3A%22idle%22%7D%2C%7B%22start%22%3A4%2C%22end%22%3A4.9%2C%22endInclusive%22%3Atrue%2C%22state%22%3A%22idle%22%7D%2C%7B%22start%22%3A5%2C%22end%22%3A5%2C%22endInclusive%22%3Atrue%2C%22state%22%3A%22idle%22%7D%5D%2C%22numberOfValues%22%3A5%2C%22freezeCurrentValues%22%3Afalse%2C%22generateAutomaticRanges%22%3Afalse%7D%5D&amp;facetOptions=%7B%7D&amp;categoryFacets=%5B%5D&amp;retrieveFirstSentences=true&amp;timezone=America%2FNew_York&amp;enableQuerySyntax=false&amp;enableDuplicateFiltering=false&amp;enableCollaborativeRating=false&amp;debug=false&amp;allowQueriesWithoutKeywords=true&amp;dictionaryFieldContext=%7B%22stores_stock%22%3A%22%22%2C%22stores_inventory%22%3A%22217%22%2C%22stores_stock_combined%22%3A%22217%22%2C%22stores_low_stock_combined%22%3A%22217%22%7D’</p>
+</div>
+</div>
+</div>
+<p>YIKES! The big block of text in the “–data” argument is URL encoded. We can decode this using online converters such as <a href="https://meyerweb.com/eric/tools/dencoder/">https://meyerweb.com/eric/tools/dencoder/</a> and prettify with <a href="">http://urlprettyprint.com/</a>. Here’s what I find:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">actionsHistory</span>              = []</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="ex">referrer</span>                    = </span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="ex">analytics</span>                   = <span class="dt">{</span><span class="st">"clientId"</span><span class="dt">:</span><span class="st">""</span><span class="op">,</span><span class="st">"documentLocation"</span><span class="dt">:</span><span class="st">"https://www.lcbo.com/en/products#t=clp-products&amp;sort=relevancy&amp;layout=card"</span><span class="op">,</span><span class="st">"documentReferrer"</span><span class="dt">:</span><span class="st">""</span><span class="op">,</span><span class="st">"pageId"</span><span class="dt">:</span><span class="st">""</span><span class="dt">}</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="ex">isGuestUser</span>                 = false</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="ex">aq</span>                          = @ec_category==Products</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="ex">searchHub</span>                   = Web_Listing_EN</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="ex">tab</span>                         = clp-products</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="ex">locale</span>                      = en</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="ex">firstResult</span>                 = 0</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="ex">numberOfResults</span>             = 48</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a><span class="ex">excerptLength</span>               = 200</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="ex">enableDidYouMean</span>            = true</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="ex">sortCriteria</span>                = relevancy</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="ex">queryFunctions</span>              = []</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a><span class="ex">rankingFunctions</span>            = []</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a><span class="ex">groupBy</span>                     = [<span class="dt">{</span><span class="st">"field"</span><span class="dt">:</span><span class="st">"@lcbo_bintag_wine_sweetness"</span><span class="op">,</span><span class="st">"injectionDepth"</span><span class="dt">:10000</span><span class="op">,</span><span class="st">"computedFields"</span><span class="dt">:[{</span><span class="st">"field"</span><span class="dt">:</span><span class="st">"@lcbo_bintag_wine_sweetness"</span><span class="op">,</span><span class="st">"operation"</span><span class="dt">:</span><span class="st">"minimum"</span><span class="dt">}</span><span class="op">,</span><span class="dt">{</span><span class="st">"field"</span><span class="dt">:</span><span class="st">"@lcbo_bintag_wine_sweetness"</span><span class="op">,</span><span class="st">"operation"</span><span class="dt">:</span><span class="st">"maximum"</span><span class="dt">}]</span><span class="op">,</span><span class="st">"maximumNumberOfValues"</span><span class="dt">:1}</span>,<span class="dt">{</span><span class="st">"field"</span><span class="dt">:</span><span class="st">"@lcbo_bintag_wine_body"</span><span class="op">,</span><span class="st">"injectionDepth"</span><span class="dt">:10000</span><span class="op">,</span><span class="st">"computedFields"</span><span class="dt">:[{</span><span class="st">"field"</span><span class="dt">:</span><span class="st">"@lcbo_bintag_wine_body"</span><span class="op">,</span><span class="st">"operation"</span><span class="dt">:</span><span class="st">"minimum"</span><span class="dt">}</span><span class="op">,</span><span class="dt">{</span><span class="st">"field"</span><span class="dt">:</span><span class="st">"@lcbo_bintag_wine_body"</span><span class="op">,</span><span class="st">"operation"</span><span class="dt">:</span><span class="st">"maximum"</span><span class="dt">}]</span><span class="op">,</span><span class="st">"maximumNumberOfValues"</span><span class="dt">:1}</span>,<span class="dt">{</span><span class="st">"field"</span><span class="dt">:</span><span class="st">"@lcbo_bintag_wine_flavor_intensity"</span><span class="op">,</span><span class="st">"injectionDepth"</span><span class="dt">:10000</span><span class="op">,</span><span class="st">"computedFields"</span><span class="dt">:[{</span><span class="st">"field"</span><span class="dt">:</span><span class="st">"@lcbo_bintag_wine_flavor_intensity"</span><span class="op">,</span><span class="st">"operation"</span><span class="dt">:</span><span class="st">"minimum"</span><span class="dt">}</span><span class="op">,</span><span class="dt">{</span><span class="st">"field"</span><span class="dt">:</span><span class="st">"@lcbo_bintag_wine_flavor_intensity"</span><span class="op">,</span><span class="st">"operation"</span><span class="dt">:</span><span class="st">"maximum"</span><span class="dt">}]</span><span class="op">,</span><span class="st">"maximumNumberOfValues"</span><span class="dt">:1}</span>,<span class="dt">{</span><span class="st">"field"</span><span class="dt">:</span><span class="st">"@lcbo_bintag_wine_acidity"</span><span class="op">,</span><span class="st">"injectionDepth"</span><span class="dt">:10000</span><span class="op">,</span><span class="st">"computedFields"</span><span class="dt">:[{</span><span class="st">"field"</span><span class="dt">:</span><span class="st">"@lcbo_bintag_wine_acidity"</span><span class="op">,</span><span class="st">"operation"</span><span class="dt">:</span><span class="st">"minimum"</span><span class="dt">}</span><span class="op">,</span><span class="dt">{</span><span class="st">"field"</span><span class="dt">:</span><span class="st">"@lcbo_bintag_wine_acidity"</span><span class="op">,</span><span class="st">"operation"</span><span class="dt">:</span><span class="st">"maximum"</span><span class="dt">}]</span><span class="op">,</span><span class="st">"maximumNumberOfValues"</span><span class="dt">:1}</span>,<span class="dt">{</span><span class="st">"field"</span><span class="dt">:</span><span class="st">"@lcbo_bintag_wine_tannins"</span><span class="op">,</span><span class="st">"injectionDepth"</span><span class="dt">:10000</span><span class="op">,</span><span class="st">"computedFields"</span><span class="dt">:[{</span><span class="st">"field"</span><span class="dt">:</span><span class="st">"@lcbo_bintag_wine_tannins"</span><span class="op">,</span><span class="st">"operation"</span><span class="dt">:</span><span class="st">"minimum"</span><span class="dt">}</span><span class="op">,</span><span class="dt">{</span><span class="st">"field"</span><span class="dt">:</span><span class="st">"@lcbo_bintag_wine_tannins"</span><span class="op">,</span><span class="st">"operation"</span><span class="dt">:</span><span class="st">"maximum"</span><span class="dt">}]</span><span class="op">,</span><span class="st">"maximumNumberOfValues"</span><span class="dt">:1}</span>,<span class="dt">{</span><span class="st">"field"</span><span class="dt">:</span><span class="st">"@ec_price"</span><span class="op">,</span><span class="st">"injectionDepth"</span><span class="dt">:10000</span><span class="op">,</span><span class="st">"computedFields"</span><span class="dt">:[{</span><span class="st">"field"</span><span class="dt">:</span><span class="st">"@ec_price"</span><span class="op">,</span><span class="st">"operation"</span><span class="dt">:</span><span class="st">"minimum"</span><span class="dt">}</span><span class="op">,</span><span class="dt">{</span><span class="st">"field"</span><span class="dt">:</span><span class="st">"@ec_price"</span><span class="op">,</span><span class="st">"operation"</span><span class="dt">:</span><span class="st">"maximum"</span><span class="dt">}]</span><span class="op">,</span><span class="st">"maximumNumberOfValues"</span><span class="dt">:1}</span>,<span class="dt">{</span><span class="st">"field"</span><span class="dt">:</span><span class="st">"@lcbo_total_volume"</span><span class="op">,</span><span class="st">"injectionDepth"</span><span class="dt">:10000</span><span class="op">,</span><span class="st">"computedFields"</span><span class="dt">:[{</span><span class="st">"field"</span><span class="dt">:</span><span class="st">"@lcbo_total_volume"</span><span class="op">,</span><span class="st">"operation"</span><span class="dt">:</span><span class="st">"minimum"</span><span class="dt">}</span><span class="op">,</span><span class="dt">{</span><span class="st">"field"</span><span class="dt">:</span><span class="st">"@lcbo_total_volume"</span><span class="op">,</span><span class="st">"operation"</span><span class="dt">:</span><span class="st">"maximum"</span><span class="dt">}]</span><span class="op">,</span><span class="st">"maximumNumberOfValues"</span><span class="dt">:1}</span>,<span class="dt">{</span><span class="st">"field"</span><span class="dt">:</span><span class="st">"@lcbo_alcohol_percent"</span><span class="op">,</span><span class="st">"injectionDepth"</span><span class="dt">:10000</span><span class="op">,</span><span class="st">"computedFields"</span><span class="dt">:[{</span><span class="st">"field"</span><span class="dt">:</span><span class="st">"@lcbo_alcohol_percent"</span><span class="op">,</span><span class="st">"operation"</span><span class="dt">:</span><span class="st">"minimum"</span><span class="dt">}</span><span class="op">,</span><span class="dt">{</span><span class="st">"field"</span><span class="dt">:</span><span class="st">"@lcbo_alcohol_percent"</span><span class="op">,</span><span class="st">"operation"</span><span class="dt">:</span><span class="st">"maximum"</span><span class="dt">}]</span><span class="op">,</span><span class="st">"maximumNumberOfValues"</span><span class="dt">:1}</span>,<span class="dt">{</span><span class="st">"field"</span><span class="dt">:</span><span class="st">"@lcbo_sugar_gm_per_ltr"</span><span class="op">,</span><span class="st">"injectionDepth"</span><span class="dt">:10000</span><span class="op">,</span><span class="st">"computedFields"</span><span class="dt">:[{</span><span class="st">"field"</span><span class="dt">:</span><span class="st">"@lcbo_sugar_gm_per_ltr"</span><span class="op">,</span><span class="st">"operation"</span><span class="dt">:</span><span class="st">"minimum"</span><span class="dt">}</span><span class="op">,</span><span class="dt">{</span><span class="st">"field"</span><span class="dt">:</span><span class="st">"@lcbo_sugar_gm_per_ltr"</span><span class="op">,</span><span class="st">"operation"</span><span class="dt">:</span><span class="st">"maximum"</span><span class="dt">}]</span><span class="op">,</span><span class="st">"maximumNumberOfValues"</span><span class="dt">:1}</span>]</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a><span class="ex">facets</span>                      = [<span class="dt">{</span><span class="st">"facetId"</span><span class="dt">:</span><span class="st">"@ec_category"</span><span class="op">,</span><span class="st">"field"</span><span class="dt">:</span><span class="st">"ec_category"</span><span class="op">,</span><span class="st">"type"</span><span class="dt">:</span><span class="st">"hierarchical"</span><span class="op">,</span><span class="st">"injectionDepth"</span><span class="dt">:1000</span><span class="op">,</span><span class="st">"delimitingCharacter"</span><span class="dt">:</span><span class="st">"|"</span><span class="op">,</span><span class="st">"filterFacetCount"</span><span class="dt">:true</span><span class="op">,</span><span class="st">"basePath"</span><span class="dt">:[</span><span class="st">"Products"</span><span class="dt">]</span><span class="op">,</span><span class="st">"filterByBasePath"</span><span class="dt">:false</span><span class="op">,</span><span class="st">"currentValues"</span><span class="dt">:[]</span><span class="op">,</span><span class="st">"preventAutoSelect"</span><span class="dt">:false</span><span class="op">,</span><span class="st">"numberOfValues"</span><span class="dt">:5</span><span class="op">,</span><span class="st">"isFieldExpanded"</span><span class="dt">:false}</span>,<span class="dt">{</span><span class="st">"facetId"</span><span class="dt">:</span><span class="st">"@lcbo_varietal_name"</span><span class="op">,</span><span class="st">"field"</span><span class="dt">:</span><span class="st">"lcbo_varietal_name"</span><span class="op">,</span><span class="st">"type"</span><span class="dt">:</span><span class="st">"specific"</span><span class="op">,</span><span class="st">"sortCriteria"</span><span class="dt">:</span><span class="st">"occurrences"</span><span class="op">,</span><span class="st">"injectionDepth"</span><span class="dt">:1000</span><span class="op">,</span><span class="st">"filterFacetCount"</span><span class="dt">:true</span><span class="op">,</span><span class="st">"currentValues"</span><span class="dt">:[]</span><span class="op">,</span><span class="st">"numberOfValues"</span><span class="dt">:5</span><span class="op">,</span><span class="st">"freezeCurrentValues"</span><span class="dt">:false</span><span class="op">,</span><span class="st">"preventAutoSelect"</span><span class="dt">:false</span><span class="op">,</span><span class="st">"isFieldExpanded"</span><span class="dt">:false}</span>,<span class="dt">{</span><span class="st">"facetId"</span><span class="dt">:</span><span class="st">"@lcbo_vqa_code"</span><span class="op">,</span><span class="st">"field"</span><span class="dt">:</span><span class="st">"lcbo_vqa_code"</span><span class="op">,</span><span class="st">"type"</span><span class="dt">:</span><span class="st">"specific"</span><span class="op">,</span><span class="st">"injectionDepth"</span><span class="dt">:1000</span><span class="op">,</span><span class="st">"filterFacetCount"</span><span class="dt">:true</span><span class="op">,</span><span class="st">"currentValues"</span><span class="dt">:[]</span><span class="op">,</span><span class="st">"numberOfValues"</span><span class="dt">:8</span><span class="op">,</span><span class="st">"freezeCurrentValues"</span><span class="dt">:false</span><span class="op">,</span><span class="st">"preventAutoSelect"</span><span class="dt">:false</span><span class="op">,</span><span class="st">"isFieldExpanded"</span><span class="dt">:false}</span>,<span class="dt">{</span><span class="st">"facetId"</span><span class="dt">:</span><span class="st">"@country_of_manufacture"</span><span class="op">,</span><span class="st">"field"</span><span class="dt">:</span><span class="st">"country_of_manufacture"</span><span class="op">,</span><span class="st">"type"</span><span class="dt">:</span><span class="st">"specific"</span><span class="op">,</span><span class="st">"sortCriteria"</span><span class="dt">:</span><span class="st">"occurrences"</span><span class="op">,</span><span class="st">"injectionDepth"</span><span class="dt">:1000</span><span class="op">,</span><span class="st">"filterFacetCount"</span><span class="dt">:true</span><span class="op">,</span><span class="st">"currentValues"</span><span class="dt">:[]</span><span class="op">,</span><span class="st">"numberOfValues"</span><span class="dt">:5</span><span class="op">,</span><span class="st">"freezeCurrentValues"</span><span class="dt">:false</span><span class="op">,</span><span class="st">"preventAutoSelect"</span><span class="dt">:false</span><span class="op">,</span><span class="st">"isFieldExpanded"</span><span class="dt">:false}</span>,<span class="dt">{</span><span class="st">"facetId"</span><span class="dt">:</span><span class="st">"@lcbo_region_name"</span><span class="op">,</span><span class="st">"field"</span><span class="dt">:</span><span class="st">"lcbo_region_name"</span><span class="op">,</span><span class="st">"type"</span><span class="dt">:</span><span class="st">"specific"</span><span class="op">,</span><span class="st">"sortCriteria"</span><span class="dt">:</span><span class="st">"occurrences"</span><span class="op">,</span><span class="st">"injectionDepth"</span><span class="dt">:1000</span><span class="op">,</span><span class="st">"filterFacetCount"</span><span class="dt">:true</span><span class="op">,</span><span class="st">"currentValues"</span><span class="dt">:[]</span><span class="op">,</span><span class="st">"numberOfValues"</span><span class="dt">:5</span><span class="op">,</span><span class="st">"freezeCurrentValues"</span><span class="dt">:false</span><span class="op">,</span><span class="st">"preventAutoSelect"</span><span class="dt">:false</span><span class="op">,</span><span class="st">"isFieldExpanded"</span><span class="dt">:false}</span>,<span class="dt">{</span><span class="st">"facetId"</span><span class="dt">:</span><span class="st">"@lcbo_program"</span><span class="op">,</span><span class="st">"field"</span><span class="dt">:</span><span class="st">"lcbo_program"</span><span class="op">,</span><span class="st">"type"</span><span class="dt">:</span><span class="st">"specific"</span><span class="op">,</span><span class="st">"sortCriteria"</span><span class="dt">:</span><span class="st">"occurrences"</span><span class="op">,</span><span class="st">"injectionDepth"</span><span class="dt">:1000</span><span class="op">,</span><span class="st">"filterFacetCount"</span><span class="dt">:true</span><span class="op">,</span><span class="st">"currentValues"</span><span class="dt">:[]</span><span class="op">,</span><span class="st">"numberOfValues"</span><span class="dt">:5</span><span class="op">,</span><span class="st">"freezeCurrentValues"</span><span class="dt">:false</span><span class="op">,</span><span class="st">"preventAutoSelect"</span><span class="dt">:false</span><span class="op">,</span><span class="st">"isFieldExpanded"</span><span class="dt">:false}</span>,<span class="dt">{</span><span class="st">"facetId"</span><span class="dt">:</span><span class="st">"@lcbo_current_offer"</span><span class="op">,</span><span class="st">"field"</span><span class="dt">:</span><span class="st">"lcbo_current_offer"</span><span class="op">,</span><span class="st">"type"</span><span class="dt">:</span><span class="st">"specific"</span><span class="op">,</span><span class="st">"sortCriteria"</span><span class="dt">:</span><span class="st">"occurrences"</span><span class="op">,</span><span class="st">"injectionDepth"</span><span class="dt">:1000</span><span class="op">,</span><span class="st">"filterFacetCount"</span><span class="dt">:true</span><span class="op">,</span><span class="st">"currentValues"</span><span class="dt">:[]</span><span class="op">,</span><span class="st">"numberOfValues"</span><span class="dt">:8</span><span class="op">,</span><span class="st">"freezeCurrentValues"</span><span class="dt">:false</span><span class="op">,</span><span class="st">"preventAutoSelect"</span><span class="dt">:false</span><span class="op">,</span><span class="st">"isFieldExpanded"</span><span class="dt">:false}</span>,<span class="dt">{</span><span class="st">"facetId"</span><span class="dt">:</span><span class="st">"@stores_stock"</span><span class="op">,</span><span class="st">"field"</span><span class="dt">:</span><span class="st">"stores_stock"</span><span class="op">,</span><span class="st">"type"</span><span class="dt">:</span><span class="st">"specific"</span><span class="op">,</span><span class="st">"injectionDepth"</span><span class="dt">:1000</span><span class="op">,</span><span class="st">"filterFacetCount"</span><span class="dt">:true</span><span class="op">,</span><span class="st">"currentValues"</span><span class="dt">:[]</span><span class="op">,</span><span class="st">"numberOfValues"</span><span class="dt">:8</span><span class="op">,</span><span class="st">"freezeCurrentValues"</span><span class="dt">:false</span><span class="op">,</span><span class="st">"preventAutoSelect"</span><span class="dt">:false</span><span class="op">,</span><span class="st">"isFieldExpanded"</span><span class="dt">:false}</span>,<span class="dt">{</span><span class="st">"facetId"</span><span class="dt">:</span><span class="st">"@ec_rating"</span><span class="op">,</span><span class="st">"field"</span><span class="dt">:</span><span class="st">"ec_rating"</span><span class="op">,</span><span class="st">"type"</span><span class="dt">:</span><span class="st">"numericalRange"</span><span class="op">,</span><span class="st">"sortCriteria"</span><span class="dt">:</span><span class="st">"descending"</span><span class="op">,</span><span class="st">"injectionDepth"</span><span class="dt">:1000</span><span class="op">,</span><span class="st">"filterFacetCount"</span><span class="dt">:true</span><span class="op">,</span><span class="st">"currentValues"</span><span class="dt">:[{</span><span class="st">"start"</span><span class="dt">:1</span><span class="op">,</span><span class="st">"end"</span><span class="dt">:1.9</span><span class="op">,</span><span class="st">"endInclusive"</span><span class="dt">:true</span><span class="op">,</span><span class="st">"state"</span><span class="dt">:</span><span class="st">"idle"</span><span class="dt">}</span><span class="op">,</span><span class="dt">{</span><span class="st">"start"</span><span class="dt">:2</span><span class="op">,</span><span class="st">"end"</span><span class="dt">:2.9</span><span class="op">,</span><span class="st">"endInclusive"</span><span class="dt">:true</span><span class="op">,</span><span class="st">"state"</span><span class="dt">:</span><span class="st">"idle"</span><span class="dt">}</span><span class="op">,</span><span class="dt">{</span><span class="st">"start"</span><span class="dt">:3</span><span class="op">,</span><span class="st">"end"</span><span class="dt">:3.9</span><span class="op">,</span><span class="st">"endInclusive"</span><span class="dt">:true</span><span class="op">,</span><span class="st">"state"</span><span class="dt">:</span><span class="st">"idle"</span><span class="dt">}</span><span class="op">,</span><span class="dt">{</span><span class="st">"start"</span><span class="dt">:4</span><span class="op">,</span><span class="st">"end"</span><span class="dt">:4.9</span><span class="op">,</span><span class="st">"endInclusive"</span><span class="dt">:true</span><span class="op">,</span><span class="st">"state"</span><span class="dt">:</span><span class="st">"idle"</span><span class="dt">}</span><span class="op">,</span><span class="dt">{</span><span class="st">"start"</span><span class="dt">:5</span><span class="op">,</span><span class="st">"end"</span><span class="dt">:5</span><span class="op">,</span><span class="st">"endInclusive"</span><span class="dt">:true</span><span class="op">,</span><span class="st">"state"</span><span class="dt">:</span><span class="st">"idle"</span><span class="dt">}]</span><span class="op">,</span><span class="st">"numberOfValues"</span><span class="dt">:5</span><span class="op">,</span><span class="st">"freezeCurrentValues"</span><span class="dt">:false</span><span class="op">,</span><span class="st">"generateAutomaticRanges"</span><span class="dt">:false}</span>]</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="ex">facetOptions</span>                = {}</span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a><span class="ex">categoryFacets</span>              = []</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a><span class="ex">retrieveFirstSentences</span>      = true</span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a><span class="ex">timezone</span>                    = America/New_York</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a><span class="ex">enableQuerySyntax</span>           = false</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a><span class="ex">enableDuplicateFiltering</span>    = false</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a><span class="ex">enableCollaborativeRating</span>   = false</span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a><span class="ex">debug</span>                       = false</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a><span class="ex">allowQueriesWithoutKeywords</span> = true</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a><span class="ex">dictionaryFieldContext</span>      = <span class="dt">{</span><span class="st">"stores_stock"</span><span class="dt">:</span><span class="st">""</span><span class="op">,</span><span class="st">"stores_inventory"</span><span class="dt">:</span><span class="st">"217"</span><span class="op">,</span><span class="st">"stores_stock_combined"</span><span class="dt">:</span><span class="st">"217"</span><span class="op">,</span><span class="st">"stores_low_stock_combined"</span><span class="dt">:</span><span class="st">"217"</span><span class="dt">}</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>We can start throwing away some arguments that we do not need such as “groupBy” and “analytics”. With some experimentation<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>, I was able to widdle it down to this:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">locale</span>                      = en</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="ex">firstResult</span>                 = <span class="st">'"$1"'</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="ex">numberOfResults</span>             = <span class="st">'"$2"'</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="ex">excerptLength</span>               = 200</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="ex">sortCriteria</span>                = @ec_price <span class="st">'"$3"'</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="ex">facets</span>                      = [<span class="dt">{</span><span class="st">"facetId"</span><span class="dt">:</span><span class="st">"@ec_category"</span><span class="op">,</span><span class="st">"field"</span><span class="dt">:</span><span class="st">"ec_category"</span><span class="op">,</span><span class="st">"type"</span><span class="dt">:</span><span class="st">"hierarchical"</span><span class="op">,</span><span class="st">"injectionDepth"</span><span class="dt">:1000</span><span class="op">,</span><span class="st">"delimitingCharacter"</span><span class="dt">:</span><span class="st">"|"</span><span class="op">,</span><span class="st">"filterFacetCount"</span><span class="dt">:true</span><span class="op">,</span><span class="st">"basePath"</span><span class="dt">:[</span><span class="st">"Products"</span><span class="dt">]</span><span class="op">,</span><span class="st">"filterByBasePath"</span><span class="dt">:false</span><span class="op">,</span><span class="st">"currentValues"</span><span class="dt">:[{</span><span class="st">"value"</span><span class="dt">:</span><span class="st">"wine"</span><span class="op">,</span><span class="st">"state"</span><span class="dt">:</span><span class="st">"idle"</span><span class="op">,</span><span class="st">"children"</span><span class="dt">:[{</span><span class="st">"value"</span><span class="dt">:</span><span class="st">"'"</span><span class="va">$4</span><span class="st">"'"</span><span class="op">,</span><span class="st">"state"</span><span class="dt">:</span><span class="st">"selected"</span><span class="op">,</span><span class="st">"children"</span><span class="dt">:[]</span><span class="op">,</span><span class="st">"retrieveChildren"</span><span class="dt">:false</span><span class="op">,</span><span class="st">"retrieveCount"</span><span class="dt">:0}]</span><span class="op">,</span><span class="st">"retrieveChildren"</span><span class="dt">:false</span><span class="op">,</span><span class="st">"retrieveCount"</span><span class="dt">:0}]</span><span class="op">,</span><span class="st">"preventAutoSelect"</span><span class="dt">:true</span><span class="op">,</span><span class="st">"numberOfValues"</span><span class="dt">:1</span><span class="op">,</span><span class="st">"isFieldExpanded"</span><span class="dt">:false}</span>]</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="ex">facetOptions</span>                = {<span class="st">"freezeFacetOrder"</span>:true}</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="ex">categoryFacets</span>              = []</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="ex">retrieveFirstSentences</span>      = true</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="ex">timezone</span>                    = America/New_York</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="ex">enableQuerySyntax</span>           = false</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="ex">enableDuplicateFiltering</span>    = false</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="ex">enableCollaborativeRating</span>   = false</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="ex">debug</span>                       = false</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="ex">allowQueriesWithoutKeywords</span> = true</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>A few additional modifications have been made to the above.</p>
+<ul>
+<li>Added a sort criterion “ec_price” for price.</li>
+<li>Modified “facets” to return only wine-related products. See the end of this section for non-wine products.</li>
+<li>Added 4 variable placeholders in particular locations with the following meanings:
+<ul>
+<li>$1: page number (starts at 0)</li>
+<li>$2: number of requests per page number (max 1000<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a>)</li>
+<li>$3: sort order; use “ascending” or “descending” text without quotation marks.</li>
+<li>$4: wine-category; must be URL encoded. E.g., red$20wine</li>
+</ul></li>
+</ul>
+<p>When we re-encode the above, we can rebuild our cURL command:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">--location</span> <span class="st">'https://platform.cloud.coveo.com/rest/search/v2?organizationId=lcboproductionx2kwygnc'</span> <span class="dt">\</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>--header <span class="st">'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/114.0'</span> <span class="dt">\</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>--header <span class="st">'Accept: */*'</span> <span class="dt">\</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>--header <span class="st">'Accept-Language: en-CA,en-US;q=0.7,en;q=0.3'</span> <span class="dt">\</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>--header <span class="st">'Accept-Encoding: gzip, deflate, br'</span> <span class="dt">\</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>--header <span class="st">'Authorization: Bearer xx883b5583-07fb-416b-874b-77cce565d927'</span> <span class="dt">\</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>--header <span class="st">'Content-Type: application/x-www-form-urlencoded; charset=UTF-8'</span> <span class="dt">\</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>--header <span class="st">'Origin: https://www.lcbo.com'</span> <span class="dt">\</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>--header <span class="st">'DNT: 1'</span> <span class="dt">\</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>--header <span class="st">'Connection: keep-alive'</span> <span class="dt">\</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>--header <span class="st">'Referer: https://www.lcbo.com/'</span> <span class="dt">\</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>--header <span class="st">'Sec-Fetch-Dest: empty'</span> <span class="dt">\</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>--header <span class="st">'Sec-Fetch-Mode: cors'</span> <span class="dt">\</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>--header <span class="st">'Sec-Fetch-Site: cross-site'</span> <span class="dt">\</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>--data <span class="st">'locale=en&amp;firstResult='"</span><span class="va">$1</span><span class="st">"'&amp;numberOfResults='"</span><span class="va">$2</span><span class="st">"'&amp;excerptLength=2000&amp;sortCriteria=%40ec_price%20'"</span><span class="va">$3</span><span class="st">"'&amp;facets=%5B%7B%22facetId%22%3A%22%40ec_category%22%2C%22field%22%3A%22ec_category%22%2C%22type%22%3A%22hierarchical%22%2C%22injectionDepth%22%3A1000%2C%22delimitingCharacter%22%3A%22%7C%22%2C%22filterFacetCount%22%3Atrue%2C%22basePath%22%3A%5B%22Products%22%5D%2C%22filterByBasePath%22%3Afalse%2C%22currentValues%22%3A%5B%7B%22value%22%3A%22wine%22%2C%22state%22%3A%22idle%22%2C%22children%22%3A%5B%7B%22value%22%3A%22'"</span><span class="va">$4</span><span class="st">"'%22%2C%22state%22%3A%22selected%22%2C%22children%22%3A%5B%5D%2C%22retrieveChildren%22%3Afalse%2C%22retrieveCount%22%3A0%7D%5D%2C%22retrieveChildren%22%3Afalse%2C%22retrieveCount%22%3A0%7D%5D%2C%22preventAutoSelect%22%3Atrue%2C%22numberOfValues%22%3A1%2C%22isFieldExpanded%22%3Afalse%7D%5D&amp;facetOptions=%7B%22freezeFacetOrder%22%3Atrue%7D&amp;categoryFacets=%5B%5D&amp;retrieveFirstSentences=true&amp;timezone=America%2FNew_York&amp;enableQuerySyntax=false&amp;enableDuplicateFiltering=false&amp;enableCollaborativeRating=false&amp;debug=false&amp;allowQueriesWithoutKeywords=true'</span> <span class="dt">\</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>--output <span class="st">''"</span><span class="va">$5</span><span class="st">"''</span> </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>I added the “–output” command and a 5th variable placeholder which represents the output filename. Save the script and run it in a terminal with the following commands:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="fu">chmod</span> +x wine_request.sh</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="ex">./wine_request.sh</span> 0 1000 ascending red%20wine redwine.json</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>The arguments trailing the script “./wine_request.sh” are passed to the numbered arguments $1 through $5, respectively. Congratulations! We have downloaded and saved the JSON file as ‘redwine.json’. Better yet, we can download 1,000 products per query!</p>
+<p>There are non-wine beverages as well (e.g., beer, spirits, cider, icewine). Due to the query structure, we cannot use the same script above for non-wine products. We can create a second script that is nearly identical with the same arguments.</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">--location</span> <span class="st">'https://platform.cloud.coveo.com/rest/search/v2?organizationId=lcboproductionx2kwygnc'</span> <span class="dt">\</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>--header <span class="st">'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:109.0) Gecko/20100101 Firefox/114.0'</span> <span class="dt">\</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>--header <span class="st">'Accept: */*'</span> <span class="dt">\</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>--header <span class="st">'Accept-Language: en-CA,en-US;q=0.7,en;q=0.3'</span> <span class="dt">\</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>--header <span class="st">'Accept-Encoding: gzip, deflate, br'</span> <span class="dt">\</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>--header <span class="st">'Authorization: Bearer xx883b5583-07fb-416b-874b-77cce565d927'</span> <span class="dt">\</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>--header <span class="st">'Content-Type: application/x-www-form-urlencoded; charset=UTF-8'</span> <span class="dt">\</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>--header <span class="st">'Origin: https://www.lcbo.com'</span> <span class="dt">\</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>--header <span class="st">'DNT: 1'</span> <span class="dt">\</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>--header <span class="st">'Connection: keep-alive'</span> <span class="dt">\</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>--header <span class="st">'Referer: https://www.lcbo.com/'</span> <span class="dt">\</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>--header <span class="st">'Sec-Fetch-Dest: empty'</span> <span class="dt">\</span></span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>--header <span class="st">'Sec-Fetch-Mode: cors'</span> <span class="dt">\</span></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>--header <span class="st">'Sec-Fetch-Site: cross-site'</span> <span class="dt">\</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>--data <span class="st">'locale=en&amp;firstResult='"</span><span class="va">$1</span><span class="st">"'&amp;numberOfResults='"</span><span class="va">$2</span><span class="st">"'&amp;excerptLength=2000&amp;sortCriteria=%40ec_price%20'"</span><span class="va">$3</span><span class="st">"'&amp;facets=%5B%7B%22facetId%22%3A%22%40ec_category%22%2C%22field%22%3A%22ec_category%22%2C%22type%22%3A%22hierarchical%22%2C%22injectionDepth%22%3A1000%2C%22delimitingCharacter%22%3A%22%7C%22%2C%22filterFacetCount%22%3Atrue%2C%22basePath%22%3A%5B%22Products%22%5D%2C%22filterByBasePath%22%3Afalse%2C%22currentValues%22%3A%5B%7B%22value%22%3A%22'"</span><span class="va">$4</span><span class="st">"'%22%2C%22state%22%3A%22selected%22%2C%22children%22%3A%5B%5D%2C%22retrieveChildren%22%3Afalse%2C%22retrieveCount%22%3A0%7D%5D%2C%22preventAutoSelect%22%3Atrue%2C%22numberOfValues%22%3A1%2C%22isFieldExpanded%22%3Afalse%7D%5D&amp;facetOptions=%7B%22freezeFacetOrder%22%3Atrue%7D&amp;categoryFacets=%5B%5D&amp;retrieveFirstSentences=true&amp;timezone=America%2FNew_York&amp;enableQuerySyntax=false&amp;enableDuplicateFiltering=false&amp;enableCollaborativeRating=false&amp;debug=false&amp;allowQueriesWithoutKeywords=true'</span> <span class="dt">\</span></span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>--output <span class="st">''"</span><span class="va">$5</span><span class="st">"''</span>  </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="part-3-collecting-all-the-data" class="level3">
+<h3 class="anchored" data-anchor-id="part-3-collecting-all-the-data">Part 3: Collecting all the data</h3>
+<p>Okay… so how do I get all the products?</p>
+<p>We need to create another script that executes multiple requests. Below, I will describe pieces of a script that we will combine at the end.</p>
+<section id="a.-run-a-loop-over-each-category-of-wine" class="level4">
+<h4 class="anchored" data-anchor-id="a.-run-a-loop-over-each-category-of-wine">A. Run a loop over each category of wine</h4>
+<p>I have a text file containing wine categories in each row. The first column is the URL encoded string to pass into the cURL command. The second column is the prefix for the filenames.</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-7-contents" aria-controls="callout-7" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+code/wine_names.txt
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-7" class="callout-7-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p>red%20wine redwine</p>
+<p>white%20wine whitewine</p>
+<p>sparkling%20wine sparklingwine</p>
+<p>rose%20wine rosewine</p>
+<p>fortified%20wine fortifiedwine</p>
+<p>champagne champagne</p>
+<p>sake%20%26%20rice%20wine sakericewine</p>
+<p>specialty%20wine specialtywine</p>
+<p>gifts%20and%20samplers giftsandsamplers</p>
+<p>icewine icewine</p>
+</div>
+</div>
+</div>
+<p>The following while loop iterates over each row in the text file above. The first and second columns are represented as variables “htag” and “ftag”. These variables are into a function called “scrape_request_loop()”.</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="cf">while</span> <span class="va">IFS</span><span class="op">=</span> <span class="bu">read</span> <span class="at">-r</span> <span class="va">htag</span> <span class="va">ftag</span><span class="kw">;</span> <span class="cf">do</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    <span class="ex">scrape_request_loop</span> <span class="va">$htag</span> <span class="va">$ftag</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="cf">done</span> <span class="op">&lt;</span> ./code/wine_names.txt</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="b.-loop-over-page-number-requests" class="level4">
+<h4 class="anchored" data-anchor-id="b.-loop-over-page-number-requests">B. Loop over page number requests</h4>
+<p>The function “scrape_request_loop()” has multiple steps and can be seen in its entirety at the end of this subsection. I first describe the function in chunks before combining the chunks together.</p>
+<p>We request the first 1,000 products for the specified category with the command below. You can assume the function “request_ascending()” executes the cURL command and saves the JSON file.</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co"># $1: $htag; wine-category URL substring; e.g., red$20wine</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="co"># $2: $ftag; wine-category filename prefix; e.g., redwine</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co"># E.g., request_ascending pageNumber numProducts htag ftag</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="ex">request_ascending</span> 0 1000 <span class="va">$1</span> <span class="va">$2</span>  </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>The JSON file contains a variable “totalCount” which is the number of products found in the category specified. This is important since it determines whether there are more than 1,000 wines in this category. The following commands read the newly made JSON file (using “jq”) and determines how many more query requests are needed. It then makes these query requests with the for loop. The for loop is skipped if “totalCount” is less than 1000.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="va">totalCount</span><span class="op">=</span><span class="va">$(</span><span class="ex">jq</span> <span class="st">'.totalCount'</span> <span class="va">$fname)</span> <span class="co"># Read newly made JSON file with jq. Get totalCount.</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="va">countPer1000</span><span class="op">=</span><span class="va">$((totalCount</span><span class="op">/</span><span class="dv">1000</span><span class="va">))</span> <span class="co"># Number of 1000-batches needed.</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="va">maxPages</span><span class="op">=</span><span class="va">$countPer1000</span> <span class="co"># Maximum number of pages (redundant for now...)</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> pageNumber <span class="kw">in</span> <span class="va">$(</span><span class="fu">seq</span> 1000 1000 <span class="va">$(($maxPages</span><span class="op">*</span><span class="dv">1000</span><span class="va">)))</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="cf">do</span></span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>  <span class="ex">request_ascending</span> <span class="va">$pageNumber</span> 1000 <span class="va">$1</span> <span class="va">$2</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="cf">done</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Unfortunately, the solution above does not work if “totalCount” exceeds 5,000. If you request “pageNumber” 5 and beyond (the index starts at 0), the server will return results for “pageNumber = 4”. There appears to be a hidden limit set by the server. While this is mildly annoying, the simple fix is to reverse the sort order from ascending to descending and query again. Of course, this solution cannot work immediately since there are 13,186 products and only 10,000 will be delivered. This is why I filtered by product category to reduce the maximum results. This solution will also fail for red wines since there are 9,400 product descriptions available. That will not happen any time soon and is a future Stephen problem<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a>.</p>
+<p>We need to change the “maxPages” definition to take the minimum between (“countPer1000”, 4).</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="va">maxPages</span><span class="op">=</span><span class="va">$(($countPer1000</span><span class="op">&lt;</span><span class="dv">4</span><span class="op">?</span><span class="va">$countPer1000</span><span class="op">:</span><span class="dv">4</span><span class="va">))</span> <span class="co"># Minimum value b/w (countPer1000, 4)</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>After the for loop executing the function “request_ascending()” is complete, we need to append the following for loop to obtain the remaining solutions:</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="bu">[</span> <span class="va">$countPer1000</span> <span class="ot">-ge</span> 5 <span class="bu">]</span><span class="kw">;</span> <span class="cf">then</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> pageNumber <span class="kw">in</span> <span class="va">$(</span><span class="fu">seq</span> 0 1000 <span class="va">$(($countPer1000</span><span class="op">*</span><span class="dv">1000</span><span class="op">-</span><span class="dv">4000</span><span class="va">)))</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">do</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>        <span class="ex">request_descending</span> <span class="va">$pageNumber</span> 1000 <span class="va">$1</span> <span class="va">$2</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">done</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="cf">fi</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="c.-the-entire-script" class="level4">
+<h4 class="anchored" data-anchor-id="c.-the-entire-script">C. The entire script</h4>
+<p>The entire script is shown below. After setting permissions (i.e., “chmod +x”), the script starts at the bottom where the while loops begin.</p>
+<p>The functions “request_ascending()” and “request_descending()” contain the command to execute the cURL scripts.</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="co">#!/bin/bash</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="fu">chmod</span> +x code/wine_request.sh</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="fu">chmod</span> +x code/nonwine_request.sh</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="fu">request_ascending ()</span> <span class="kw">{</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>    <span class="co"># $1: start index</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>    <span class="co"># $2: number of requests</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>    <span class="co"># $3: wine-category URL substring; e.g., red$20wine</span></span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>    <span class="co"># $4: wine-category filename prefix; e.g., redwine</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>    <span class="va">fname</span><span class="op">=</span><span class="st">"json/products/</span><span class="va">$4</span><span class="st">.a.</span><span class="va">$1</span><span class="st">.json"</span></span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sudo</span> <span class="va">$SCRAPE_SH</span> <span class="va">$1</span> <span class="va">$2</span> ascending <span class="va">$3</span> <span class="va">$fname</span></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sleep</span> 1</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a><span class="fu">request_descending ()</span> <span class="kw">{</span></span>
+<span id="cb11-15"><a href="#cb11-15" aria-hidden="true" tabindex="-1"></a>    <span class="va">fname</span><span class="op">=</span><span class="st">"json/products/</span><span class="va">$4</span><span class="st">.d.</span><span class="va">$1</span><span class="st">.json"</span></span>
+<span id="cb11-16"><a href="#cb11-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sudo</span> <span class="va">$SCRAPE_SH</span> <span class="va">$1</span> <span class="va">$2</span> descending <span class="va">$3</span> <span class="va">$fname</span></span>
+<span id="cb11-17"><a href="#cb11-17" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sleep</span> 1</span>
+<span id="cb11-18"><a href="#cb11-18" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span>
+<span id="cb11-19"><a href="#cb11-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-20"><a href="#cb11-20" aria-hidden="true" tabindex="-1"></a><span class="fu">scrape_request_loop ()</span><span class="kw">{</span></span>
+<span id="cb11-21"><a href="#cb11-21" aria-hidden="true" tabindex="-1"></a>    <span class="co"># $1: $htag; wine-category URL substring; e.g., red$20wine</span></span>
+<span id="cb11-22"><a href="#cb11-22" aria-hidden="true" tabindex="-1"></a>    <span class="co"># $2: $ftag; wine-category filename prefix; e.g., redwine</span></span>
+<span id="cb11-23"><a href="#cb11-23" aria-hidden="true" tabindex="-1"></a>    <span class="ex">request_ascending</span> 0 1000 <span class="va">$1</span> <span class="va">$2</span></span>
+<span id="cb11-24"><a href="#cb11-24" aria-hidden="true" tabindex="-1"></a>    <span class="va">totalCount</span><span class="op">=</span><span class="va">$(</span><span class="ex">jq</span> <span class="st">'.totalCount'</span> <span class="va">$fname)</span></span>
+<span id="cb11-25"><a href="#cb11-25" aria-hidden="true" tabindex="-1"></a>    <span class="va">countPer1000</span><span class="op">=</span><span class="va">$((totalCount</span><span class="op">/</span><span class="dv">1000</span><span class="va">))</span></span>
+<span id="cb11-26"><a href="#cb11-26" aria-hidden="true" tabindex="-1"></a>    <span class="va">maxPages</span><span class="op">=</span><span class="va">$(($countPer1000</span><span class="op">&lt;</span><span class="dv">4</span><span class="op">?</span><span class="va">$countPer1000</span><span class="op">:</span><span class="dv">4</span><span class="va">))</span>  </span>
+<span id="cb11-27"><a href="#cb11-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-28"><a href="#cb11-28" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> <span class="va">$(</span><span class="fu">seq</span> 1000 1000 <span class="va">$(($maxPages</span><span class="op">*</span><span class="dv">1000</span><span class="va">)))</span></span>
+<span id="cb11-29"><a href="#cb11-29" aria-hidden="true" tabindex="-1"></a>    <span class="cf">do</span></span>
+<span id="cb11-30"><a href="#cb11-30" aria-hidden="true" tabindex="-1"></a>        <span class="ex">request_ascending</span> <span class="va">$i</span> 1000 <span class="va">$1</span> <span class="va">$2</span></span>
+<span id="cb11-31"><a href="#cb11-31" aria-hidden="true" tabindex="-1"></a>    <span class="cf">done</span></span>
+<span id="cb11-32"><a href="#cb11-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-33"><a href="#cb11-33" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="bu">[</span> <span class="va">$countPer1000</span> <span class="ot">-ge</span> 5 <span class="bu">]</span><span class="kw">;</span> <span class="cf">then</span></span>
+<span id="cb11-34"><a href="#cb11-34" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> i <span class="kw">in</span> <span class="va">$(</span><span class="fu">seq</span> 0 1000 <span class="va">$(($countPer1000</span><span class="op">*</span><span class="dv">1000</span><span class="op">-</span><span class="dv">4000</span><span class="va">)))</span></span>
+<span id="cb11-35"><a href="#cb11-35" aria-hidden="true" tabindex="-1"></a>        <span class="cf">do</span></span>
+<span id="cb11-36"><a href="#cb11-36" aria-hidden="true" tabindex="-1"></a>            <span class="ex">request_descending</span> <span class="va">$i</span> 1000 <span class="va">$1</span> <span class="va">$2</span></span>
+<span id="cb11-37"><a href="#cb11-37" aria-hidden="true" tabindex="-1"></a>        <span class="cf">done</span></span>
+<span id="cb11-38"><a href="#cb11-38" aria-hidden="true" tabindex="-1"></a>    <span class="cf">fi</span></span>
+<span id="cb11-39"><a href="#cb11-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-40"><a href="#cb11-40" aria-hidden="true" tabindex="-1"></a><span class="kw">}</span></span>
+<span id="cb11-41"><a href="#cb11-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-42"><a href="#cb11-42" aria-hidden="true" tabindex="-1"></a><span class="va">SCRAPE_SH</span><span class="op">=</span><span class="st">"./code/wine_request.sh"</span></span>
+<span id="cb11-43"><a href="#cb11-43" aria-hidden="true" tabindex="-1"></a><span class="cf">while</span> <span class="va">IFS</span><span class="op">=</span> <span class="bu">read</span> <span class="at">-r</span> <span class="va">htag</span> <span class="va">ftag</span><span class="kw">;</span> <span class="cf">do</span></span>
+<span id="cb11-44"><a href="#cb11-44" aria-hidden="true" tabindex="-1"></a>    <span class="ex">scrape_request_loop</span> <span class="va">$htag</span> <span class="va">$ftag</span></span>
+<span id="cb11-45"><a href="#cb11-45" aria-hidden="true" tabindex="-1"></a><span class="cf">done</span> <span class="op">&lt;</span> ./code/wine_names.txt</span>
+<span id="cb11-46"><a href="#cb11-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-47"><a href="#cb11-47" aria-hidden="true" tabindex="-1"></a><span class="va">SCRAPE_SH</span><span class="op">=</span><span class="st">"./code/nonwine_request.sh"</span></span>
+<span id="cb11-48"><a href="#cb11-48" aria-hidden="true" tabindex="-1"></a><span class="cf">while</span> <span class="va">IFS</span><span class="op">=</span> <span class="bu">read</span> <span class="at">-r</span> <span class="va">htag</span> <span class="va">ftag</span><span class="kw">;</span> <span class="cf">do</span></span>
+<span id="cb11-49"><a href="#cb11-49" aria-hidden="true" tabindex="-1"></a>    <span class="ex">scrape_request_loop</span> <span class="va">$htag</span> <span class="va">$ftag</span></span>
+<span id="cb11-50"><a href="#cb11-50" aria-hidden="true" tabindex="-1"></a><span class="cf">done</span> <span class="op">&lt;</span> ./code/nonwine_names.txt</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+</section>
+</section>
+<section id="pros-cons-1" class="level2">
+<h2 class="anchored" data-anchor-id="pros-cons-1">Pros &amp; Cons</h2>
+<section id="pros" class="level4">
+<h4 class="anchored" data-anchor-id="pros">Pros</h4>
+<ul>
+<li>Extremely fast (1 min!) and no babysitting</li>
+<li>Very cheap</li>
+<li>Automatable for Github Actions (a big deal)</li>
+<li>Gentle on servers</li>
+<li>Can execute more frequently for up to date price changes</li>
+<li>Requests existing products only (unlike the brute-force method)</li>
+</ul>
+</section>
+<section id="cons" class="level4">
+<h4 class="anchored" data-anchor-id="cons">Cons</h4>
+<ul>
+<li>Read and manage URL-encoded variables carefully</li>
+<li>Time to understand cURL parameters</li>
+<li>Close attention to hidden limits</li>
+</ul>
+</section>
+</section>
+<section id="data-product-summary" class="level2">
+<h2 class="anchored" data-anchor-id="data-product-summary">Data product summary</h2>
+<p>Once I have all of the product description data, I can generate a list of SKU numbers that I can query to obtain the live inventory (see Part 2 of this blog series)! There are approximately registered products: 9,400 wine and 4,100 non-wine. “Non-wine” products can include beer, liquor, and reusuable bags. Only 2,800 wines and 2,100 non-wines are purchasable as of 5/14/2023.</p>
+<p>The files described above are located in the repository: <a href="https://github.com/royourboat/lcbo-wine-scraper">https://github.com/royourboat/lcbo-wine-scraper</a>. Specifically,</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>code/all_product_request.sh</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>code/wine_request.sh</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>code/nonwine_request.sh</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>code/wine_names.txt</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>code/nonwine_names.txt</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+
+
+</section>
+</section>
+
+
+<div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
+
+<ol>
+<li id="fn1"><p>In Postman, you can delete lines of code in the Code Snippet panel and see its impact by clicking “Send”. Super convenient.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2"><p>found through trial and error<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn3"><p>I can partition the query using different categories.<a href="#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section><section class="quarto-appendix-contents"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{ro2023,
+  author = {Ro, Stephen},
+  title = {Scraping {LCBO} {Data} {(Part} 3: {Product} {Descriptions)}},
+  date = {2023-06-17},
+  url = {https://royourboat.github.io/posts/2023-06-17-lcbo-scraper/},
+  langid = {en}
+}
+</code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-ro2023" class="csl-entry quarto-appendix-citeas" role="listitem">
+Ro, Stephen. 2023. <span>“Scraping LCBO Data (Part 3: Product
+Descriptions).”</span> June 17, 2023. <a href="https://royourboat.github.io/posts/2023-06-17-lcbo-scraper/">https://royourboat.github.io/posts/2023-06-17-lcbo-scraper/</a>.
+</div></div></section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const disableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'prefetch';
+    }
+  }
+  const enableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'stylesheet';
+    }
+  }
+  const manageTransitions = (selector, allowTransitions) => {
+    const els = window.document.querySelectorAll(selector);
+    for (let i=0; i < els.length; i++) {
+      const el = els[i];
+      if (allowTransitions) {
+        el.classList.remove('notransition');
+      } else {
+        el.classList.add('notransition');
+      }
+    }
+  }
+  const toggleColorMode = (alternate) => {
+    // Switch the stylesheets
+    const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+    manageTransitions('#quarto-margin-sidebar .nav-link', false);
+    if (alternate) {
+      enableStylesheet(alternateStylesheets);
+      for (const sheetNode of alternateStylesheets) {
+        if (sheetNode.id === "quarto-bootstrap") {
+          toggleBodyColorMode(sheetNode);
+        }
+      }
+    } else {
+      disableStylesheet(alternateStylesheets);
+      toggleBodyColorPrimary();
+    }
+    manageTransitions('#quarto-margin-sidebar .nav-link', true);
+    // Switch the toggles
+    const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+    for (let i=0; i < toggles.length; i++) {
+      const toggle = toggles[i];
+      if (toggle) {
+        if (alternate) {
+          toggle.classList.add("alternate");     
+        } else {
+          toggle.classList.remove("alternate");
+        }
+      }
+    }
+    // Hack to workaround the fact that safari doesn't
+    // properly recolor the scrollbar when toggling (#1455)
+    if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+      manageTransitions("body", false);
+      window.scrollTo(0, 1);
+      setTimeout(() => {
+        window.scrollTo(0, 0);
+        manageTransitions("body", true);
+      }, 40);  
+    }
+  }
+  const isFileUrl = () => { 
+    return window.location.protocol === 'file:';
+  }
+  const hasAlternateSentinel = () => {  
+    let styleSentinel = getColorSchemeSentinel();
+    if (styleSentinel !== null) {
+      return styleSentinel === "alternate";
+    } else {
+      return false;
+    }
+  }
+  const setStyleSentinel = (alternate) => {
+    const value = alternate ? "alternate" : "default";
+    if (!isFileUrl()) {
+      window.localStorage.setItem("quarto-color-scheme", value);
+    } else {
+      localAlternateSentinel = value;
+    }
+  }
+  const getColorSchemeSentinel = () => {
+    if (!isFileUrl()) {
+      const storageValue = window.localStorage.getItem("quarto-color-scheme");
+      return storageValue != null ? storageValue : localAlternateSentinel;
+    } else {
+      return localAlternateSentinel;
+    }
+  }
+  let localAlternateSentinel = 'default';
+  // Dark / light mode switch
+  window.quartoToggleColorScheme = () => {
+    // Read the current dark / light value 
+    let toAlternate = !hasAlternateSentinel();
+    toggleColorMode(toAlternate);
+    setStyleSentinel(toAlternate);
+  };
+  // Ensure there is a toggle, if there isn't float one in the top right
+  if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+    const a = window.document.createElement('a');
+    a.classList.add('top-right');
+    a.classList.add('quarto-color-scheme-toggle');
+    a.href = "";
+    a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+    const i = window.document.createElement("i");
+    i.classList.add('bi');
+    a.appendChild(i);
+    window.document.body.appendChild(a);
+  }
+  // Switch to dark mode if need be
+  if (hasAlternateSentinel()) {
+    toggleColorMode(true);
+  } else {
+    toggleColorMode(false);
+  }
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>

@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.433">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Stephen Ro">
+<meta name="dcterms.date" content="2023-06-10">
+<meta name="description" content="Scraping with regex.">
+
+<title>Stephen Ro - Scraping LCBO Data (Part 2: Product Inventory)</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Stephen Ro</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html" rel="" target="">
+ <span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../about.html" rel="" target="">
+ <span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../posts.html" rel="" target="">
+ <span class="menu-text">Blog</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../resume/stephen_ro_resume.pdf" rel="" target="">
+ <span class="menu-text">Resume</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/royourboat" rel="" target=""><i class="bi bi-github" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://www.linkedin.com/in/stephenro/" rel="" target=""><i class="bi bi-linkedin" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="mailto:stephensro@gmail.com" rel="" target=""><i class="bi bi-envelope" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+</ul>
+            <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">Scraping LCBO Data (Part 2: Product Inventory)</h1>
+                  <div>
+        <div class="description">
+          Scraping with regex.
+        </div>
+      </div>
+                          <div class="quarto-categories">
+                <div class="quarto-category">Python</div>
+                <div class="quarto-category">HTML</div>
+                <div class="quarto-category">bash</div>
+                <div class="quarto-category">JSON</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p><a href="https://royourboat.github.io/">Stephen Ro</a> </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">June 10, 2023</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#what-the-regex" id="toc-what-the-regex" class="nav-link active" data-scroll-target="#what-the-regex">What The Regex!</a></li>
+  <li><a href="#the-code" id="toc-the-code" class="nav-link" data-scroll-target="#the-code">The code</a>
+  <ul class="collapse">
+  <li><a href="#bash-sed-and-regex" id="toc-bash-sed-and-regex" class="nav-link" data-scroll-target="#bash-sed-and-regex">Bash, sed, and regex</a>
+  <ul class="collapse">
+  <li><a href="#sed" id="toc-sed" class="nav-link" data-scroll-target="#sed">sed</a></li>
+  <li><a href="#tail" id="toc-tail" class="nav-link" data-scroll-target="#tail">tail</a></li>
+  <li><a href="#more-sed" id="toc-more-sed" class="nav-link" data-scroll-target="#more-sed">More sed!</a></li>
+  <li><a href="#make-it-pretty-with-jq-and-save" id="toc-make-it-pretty-with-jq-and-save" class="nav-link" data-scroll-target="#make-it-pretty-with-jq-and-save">Make it pretty with jq and save!</a></li>
+  </ul></li>
+  <li><a href="#loop-the-script-for-each-sku-number" id="toc-loop-the-script-for-each-sku-number" class="nav-link" data-scroll-target="#loop-the-script-for-each-sku-number">Loop the script for each SKU number:</a></li>
+  </ul></li>
+  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion">Conclusion</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+<p>A fundamental feature of my wine app is to only recommend bottles available right now at a store nearby.</p>
+<p>LCBO’s product inventory data is live and readily accessible for any given product given the unique SKU number (a 6 digit code). For instance, SKU number 328534 leads you to the inventory page for Jackson-Triggs Cabernet Sauvignon using the URL <a href="https://www.lcbo.com/en/storeinventory/?sku=328534">https://www.lcbo.com/en/storeinventory/?sku=328534</a>. This URL is easy to query considering we only have to change one parameter, assuming we have a list of LCBO’s SKU numbers (see Part 3 of this series for how I got the numbers).</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-1-contents" aria-controls="callout-1" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Sample inventory page
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-1" class="callout-1-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="lcbo_inventory.png" class="img-fluid figure-img" style="width:100.0%"></p>
+<figcaption class="figure-caption"><a href="https://www.lcbo.com/en/storeinventory/?sku=328534">Inventory for Jackson-Triggs Cabernet Sauvignon</a></figcaption>
+</figure>
+</div>
+</div>
+</div>
+</div>
+<section id="what-the-regex" class="level1">
+<h1>What The Regex!</h1>
+<p>Unlike the store information, the inventory data is not transferred via a JSON file. There is a link at the page bottom that lets you download the inventory table. However, The link is a “blob” URL which can only be generated by a browser. There are simple python methods to generate the blob URL. I found this unnecessary after closer inspection of the HTML code!</p>
+<p>If you look at the HTML code using Inspect, you’ll find the inventory data is embedded in a large table with thousands of HTML code. I cannot show it here since it is literally over 550,000 characters long. You can certainly regex the inventory data from the embedded HTML code… Perhaps OpenAI can give a hand.</p>
+<p>I found a pleasant surprise when cURL-ing the URL on Postman. The HTML code returned contains the inventory table as a JSON in text format! Have a look:</p>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-2-contents" aria-controls="callout-2" aria-expanded="false" aria-label="Toggle callout">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Store Inventory JSON - We want line 4004!
+</div>
+<div class="callout-btn-toggle d-inline-block border-0 py-1 ps-1 pe-0 float-end"><i class="callout-toggle"></i></div>
+</div>
+<div id="callout-2" class="callout-2-contents callout-collapse collapse">
+<div class="callout-body-container callout-body">
+<p><img src="lcbo_inventory_html.png" class="img-fluid" style="width:100.0%"></p>
+</div>
+</div>
+</div>
+<p>Wow! All we have to do is cURL the inventory page and do a little regex. This can be done entirely in bash and remarkably quickly.</p>
+</section>
+<section id="the-code" class="level1">
+<h1>The code</h1>
+<section id="bash-sed-and-regex" class="level2">
+<h2 class="anchored" data-anchor-id="bash-sed-and-regex">Bash, sed, and regex</h2>
+<p>The cURL command is fairly simple:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">--location</span> <span class="st">"https://www.lcbo.com/en/storeinventory/?sku="</span><span class="va">$1</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>where the variable “1” will be substituted by the SKU number. I need to process the HTML code delivered before we can extract the JSON. This is done using “pipes” represented by the character “|” without quotes. For example, we can add a subsequent command after cURL called “grep” using a pipe as follows:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">--location</span> <span class="st">"https://www.lcbo.com/en/storeinventory/?sku="</span><span class="va">$1</span> <span class="dt">\ </span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span> <span class="fu">tac</span> <span class="kw">|</span> <span class="fu">tac</span> <span class="dt">\</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span> <span class="fu">grep</span> <span class="at">-m</span> 1 <span class="st">'storeList'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>The backslash “\” lets you continue the command on a new line. “grep” lets you search files or, in this case, HTML text piped from the cURL command. The option “-m 1” is equivalent to “–max-count=1” which says to stop searching after the first detection of the pattern ‘storeList’.</p>
+<p>A funny thing happens if we do not include the two piped “tac” commands before grep. The tac command simply reverses the incoming file. Executing two tac commands will return the original cURL output! Read <a href="https://stackoverflow.com/questions/16703647/why-does-curl-return-error-23-failed-writing-body"><span class="citation" data-cites="Kaworu">@Kaworu</span>’s</a> for an explanation why this is the case.</p>
+<p>The sequence of piped commands will return line 4004, which looks like this:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>"storeList":[["City","Intersection","Address Line 1","Address Line 2","Phone Number","Store Number","Available Inventory"],["St. Catharines","Vansickle &amp; Fourth","420 Vansickle Road","","(905) 685-8000","392","1"],["Kitchener","Fairway &amp; Manitou","655 Fairway Road South","","(519) 894-0710","381","1"],["Lasalle","Malden Rd &amp; Elmdale Ave","1825 Wyoming Avenue","","(519) 250-9847","370","2"],["Toronto-North York","Wilson &amp; Dufferin","675 Wilson Avenue","","(416) 636-5349","360","4"],["Toronto-North York","Bayview &amp; Sheppard (Bayview Village)","2901 Bayview Avenue - Unit 125","BAYVIEW VILLAGE MALL","(416) 222-7658","355","3"],["Dundas","Osler &amp; Main W","119 Osler Drive","UNIT 13A","(905) 628-2042","25","4"],["Toronto-Central","Dupont &amp; Spadina","232 Dupont Street","","(416) 922-7066","15","3"],["Ancaster","Golf Links &amp; Hwy 403 (Meadowlands)","737 Golf Links Road","MEADOWLANDS CENTRE","(905) 304-9608","21","1"],["Burlington","Appleby Line &amp; New St","501 Appleby Line","","(905) 639-0337","641","1"],["Aurora","Leslie &amp; Wellington","94 First Commerce Drive","","(905) 751-0684","658","4"],["Mississauga","Dundas &amp; Winston Churchill (Woodchester)","2458 Dundas Street West","WOODCHESTER MALL","(905) 822-1776","494","1"],["Oakville","Cornwall &amp; Trafalgar","321 Cornwall Road","UNIT C120","(905) 845-8100","486","1"],["Windsor","Tecumseh &amp; Lauzon","7640 Tecumseh Rd. E.","","(519) 944-4014","490","1"],["Toronto-North York","Avenue &amp; Lawrence","1838-1844 Avenue Road","","(416) 785-6389","452","1"],["Newmarket","Leslie &amp; Davis","17365 Leslie Street","","(905) 898-1062","453","1"],["Markham","Hwy 7 &amp; Woodbine","3075 Highway 7 East","","(905) 940-2768","590","9"],["Markham","Hwy 7 &amp; Birchmount\/village Pkwy","3991 Highway 7","","(905) 479-9612","580","3"],["Markham","Markham Rd &amp; Bur Oak","9720 Markham Road","","(905) 201-9743","585","1"],["Burlington","Walkers Line &amp; Dundas St","3041 Walkers Line","","(905) 331-5792","551","1"],["Kitchener","Highland &amp; Westmount (Highland Rd Plaza)","324 Highland Road West Unit 6","HIGHLAND ROAD PLAZA","(519) 745-8781","549","1"],["Richmond Hill","Yonge &amp; Hwy 7","8783 Yonge Street","","(905) 886-3511","623","5"],["Mississauga","Erin Mills &amp; Eglinton","5100 Erin Mills Parkway","SUITE 5035","(905) 607-7900","619","3"],["Innisfil","Innisfil Beach Rd &amp; 20th Sr","1465 Innisfil Beach Road","UNIT #7","(705) 436-7182","605","1"],["Pickering","Brock &amp; Kingston (Hwy 2)","1899 Brock Rd Unit K3","","(905) 427-9830","776","1"],["Woodbridge","Hwy 27 &amp; Innovation Dr","8260 Hwy. 27","","(905) 264-7366","632","4"],["Richmond Hill","Major Mackenzie &amp; Leslie","1520 Major Mackenzie Dr. E.,","","(905) 884-4700","629","3"],["Milton","Main St &amp; Thompson Rd","830 Main Street East","","(905) 864-7030","631","1"],["King City","King Rd &amp; Dufferin St","1700 King Road","UNIT #55 BUILDING B","(905) 833-0641","671","1"],["Toronto-Central","Queens Quay &amp; Cooper Street","15 Cooper Street","","(416) 864-6777","217","1"],["Aurora","Yonge &amp; Henderson","1 Henderson Drive","","(905) 727-9722","311","1"],["Toronto-Central","Eglinton &amp; Laird","65 Wicksteed Avenue","","(416) 425-6282","164","3"],["Tecumseh","E.c. Row &amp; Manning","15 Amy Croft Drive","","(519) 735-2661","278","1"],["Toronto-North York","Keele &amp; Lawrence (North Park Plaza)","1339 Lawrence Ave. West","NORTH PARK PLAZA","(416) 249-1391","279","1"],["Toronto-North York","Lawrence &amp; Don Mills","195 The Donway West","","(416) 447-0491","253","1"],["Ottawa","Bank &amp; Walkley","1980 Bank Street","","(613) 523-7763","243","1"],["Newmarket","Upper Canada Mall","17600 Yonge Street","","(905) 895-6341","226","3"],["Waterdown","Hwy 5 &amp; Hwy 6","74 Dundas Street East","","(905) 689-6855","326","2"],["Oakville","3rd Line &amp; Rebecca (Hopedale Mall)","1527 Rebecca Street","","(905) 827-5072","437","1"],["Waterloo","King N &amp; Northfield","571 King Street North","","(519) 884-8511","417","1"],["Vaughan","Major Mackenzie &amp; Weston","3631 Major Mackenzie Drive","BUILDING B","(905) 417-1102","397","3"],["Niagara Falls","Portage Rd &amp; Colborne E","3714 Portage Road","","(905) 356-3972","401","1"],["Stouffville","Main St &amp; Mostar St","5710 Main Street Unit 1","","(905) 640-3771","404","1"]],</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>We could take the above output and, with a little editing, immediately create a JSON. A small snapshot of the JSON is seen below.</p>
+<p><img src="storelist_sample.png" class="img-fluid" style="width:40.0%"></p>
+<p>There are a number of practical reasons to not do this. For instance, the only data we require is the store number and available inventory. We know the store information from Part 1 of our series and can call upon it with the store number alone. Throwing away redundant data reduces the file sizes and decreases the read time of each file. Furthermore, the JSON structure can be simpler and much more readable with restructuring! Our goal is to rebuild the JSON to look like this:</p>
+<p><img src="inventory_sample.png" class="img-fluid" style="width:20.0%"></p>
+<p>94433 is the SKU number. The keys and values are simply the store numbers and available inventory, respectively.</p>
+<section id="sed" class="level3">
+<h3 class="anchored" data-anchor-id="sed">sed</h3>
+<p>“sed” is a UNIX stream editor that lets you search, and find and replace. There is a neat online editor that lets you quickly test your ideas: <a href="https://sed.js.org/">https://sed.js.org/</a>.</p>
+<p>Here is sed piped into action:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">--location</span> <span class="st">"https://www.lcbo.com/en/storeinventory/?sku="</span><span class="va">$1</span> <span class="dt">\ </span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span> <span class="fu">grep</span> <span class="at">-m</span> 1 <span class="st">'storeList'</span> <span class="dt">\ </span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span> <span class="fu">tac</span> <span class="kw">|</span> <span class="fu">tac</span> <span class="dt">\</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span> <span class="fu">sed</span> <span class="st">'$s/,$//; s/\]\]//g; s/\],\[/\n/g; /^$/d'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Okay… sed is an alien language when you first see it. Let me break it down. To start, the output from grep is piped to sed for processing. The quoted text after sed is actually several search and replace commands concatenated together. The following text</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="st">'s/,$//; s/"storeList":\[//g; s/\]\]//g; s/\],\[/\n/g; /^$/d'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>breaks down into 4 sed commands separated by semicolons:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="ex">1.</span> <span class="st">'s/,$//'</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="ex">2.</span> <span class="st">'s/\]\]//g'</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="ex">3.</span> <span class="st">'s/\],\[/\n/g'</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="ex">4.</span> <span class="st">'/^ $/d'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>An sed command has four components separated by forward slashes “/”:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="st">'[s]ubstitute / Regexp / Replacement / [g]lobal'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>The substitute and global parameters are represented with s and g. Regexp is the regular expression you’re searching for. Replacement is the text that will <em>substitute</em> the regex expression. Below is an explanation for each command. You can follow along by pasting the output the contents of line 4004 to <a href="https://sed.js.org/">https://sed.js.org/</a> and applying the commands below.</p>
+<ol type="1">
+<li>Substitute the last comma at the end of the grep output with nothing.</li>
+</ol>
+<div class="sourceCode" id="cb8"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># ,$  &lt;-- the dollar sign $ says to get the last comma</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="st">'s/,$//'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ol start="2" type="1">
+<li>Globally substitute the double closing square brackets with nothing.<br>
+</li>
+</ol>
+<div class="sourceCode" id="cb9"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Substitute ]] with nothing (i.e., delete ]])</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="st">'s/\]\]//g'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ol start="3" type="1">
+<li>Globally substitute inner square brackets with a newline.</li>
+</ol>
+<div class="sourceCode" id="cb10"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Substitute ],[ with \n</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="st">'s/\],\[/\n/g'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ol start="4" type="1">
+<li>Delete lines with only white spaces or newlines.</li>
+</ol>
+<div class="sourceCode" id="cb11"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="st">'/^ $/d'</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Here is a sample output of the first three lines after running these sed commands:</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>"storeList":[["City","Intersection","Address Line 1","Address Line 2","Phone Number","Store Number","Available Inventory"</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>"St. Catharines","Vansickle &amp; Fourth","420 Vansickle Road","","(905) 685-8000","392","1"</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>"Kitchener","Fairway &amp; Manitou","655 Fairway Road South","","(519) 894-0710","381","1"</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>...</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="tail" class="level3">
+<h3 class="anchored" data-anchor-id="tail">tail</h3>
+<p>The “tail” command shows the last few lines of a given file. We pipe the output to “tail” and add a +2 option to return the entire text from line 2 onwards (i.e., delete the first line).</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">--location</span> <span class="st">"https://www.lcbo.com/en/storeinventory/?sku="</span><span class="va">$1</span> <span class="dt">\ </span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span> <span class="fu">grep</span> <span class="at">-m</span> 1 <span class="st">'storeList'</span> <span class="dt">\ </span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span> <span class="fu">tac</span> <span class="kw">|</span> <span class="fu">tac</span> <span class="dt">\</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span> <span class="fu">sed</span> <span class="st">'$s/,$//; s/\]\]//g; s/\],\[/\n/g; /^$/d'</span><span class="dt">\</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span> <span class="fu">tail</span> +2</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Here is the current state of our text file:</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>"St. Catharines","Vansickle &amp; Fourth","420 Vansickle Road","","(905) 685-8000","392","1"</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>"Kitchener","Fairway &amp; Manitou","655 Fairway Road South","","(519) 894-0710","381","1"</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>...</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="more-sed" class="level3">
+<h3 class="anchored" data-anchor-id="more-sed">More sed!</h3>
+<p>Our next sed command will take the output and produce the JSON file we desire! Last sed, I promise. Note that we use the -r option with sed to permit extended regular expressions.</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">--location</span> <span class="st">"https://www.lcbo.com/en/storeinventory/?sku="</span><span class="va">$1</span> <span class="dt">\ </span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span> <span class="fu">grep</span> <span class="at">-m</span> 1 <span class="st">'storeList'</span> <span class="dt">\ </span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span> <span class="fu">tac</span> <span class="kw">|</span> <span class="fu">tac</span> <span class="dt">\</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span> <span class="fu">sed</span> <span class="st">'$s/,$//; s/\]\]//g; s/\],\[/\n/g; /^$/d'</span><span class="dt">\</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span> <span class="fu">tail</span> +2 <span class="dt">\</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span> <span class="fu">sed</span> <span class="at">-r</span> <span class="st">'s/(.*,)([^,]+,[^,]+)$/\2/g; s/"*$//g; s/","/":/g ; 1s/^/{"'</span><span class="va">$1</span><span class="st">'":{/; s/$/,/ ; $s/,$/}}/'</span> </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ol type="1">
+<li>Grab the last two columns from each row.</li>
+</ol>
+<div class="sourceCode" id="cb16"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="ex">s/</span><span class="er">(</span><span class="bu">.</span><span class="pp">*</span>,<span class="kw">)(</span><span class="ex">[^,]+,[^,]+</span><span class="kw">)</span><span class="ex">$/\2/g</span><span class="kw">;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Return:</p>
+<div class="sourceCode" id="cb17"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>"392","1"</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>"381","1"</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>...</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ol start="2" type="1">
+<li>Delete the last quotation mark in each row.</li>
+</ol>
+<div class="sourceCode" id="cb18"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="ex">s/</span><span class="st">"*$//g;</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Return:</p>
+<div class="sourceCode" id="cb19"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>"392","1</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>"381","1</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>...</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ol start="3" type="1">
+<li>Globally replace the regexp (^^^) with the replacement (^^). Sorry, it gets weird referencing punctuations. I’ve added some white spaces for clarity.</li>
+</ol>
+<div class="sourceCode" id="cb20"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="ex">s/</span>   <span class="st">","</span>   /    <span class="st">":     /g</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="st">     ^^^        ^^</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Return:</p>
+<div class="sourceCode" id="cb21"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>"392":1</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a>"381":1</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>...</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ol start="4" type="1">
+<li>The start of a JSON needs an open curly bracket. Append the following text with the SKU number to the beginning: {“94433”: {</li>
+</ol>
+<div class="sourceCode" id="cb22"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="ex">1s/^/{</span><span class="st">"'</span><span class="va">$1</span><span class="st">'"</span><span class="ex">:{/</span><span class="kw">;</span> </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Return:</p>
+<div class="sourceCode" id="cb23"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>{"94433":{"392":1</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>"381":1</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>...</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ol start="5" type="1">
+<li>Add a comma at the end of each row:</li>
+</ol>
+<div class="sourceCode" id="cb24"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="ex">s/$/,/</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Return:</p>
+<div class="sourceCode" id="cb25"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>{"94433":{"392":1,</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>"381":1,</span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>...</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<ol start="6" type="1">
+<li>Add closing brackets at the end of the file to complete the JSON.</li>
+</ol>
+<div class="sourceCode" id="cb26"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="va">$s</span><span class="ex">/,$/}}/</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<p>Return:</p>
+<div class="sourceCode" id="cb27"><pre class="sourceCode default code-with-copy"><code class="sourceCode default"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>{"94433":{"392":1,</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>"381":1,</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>...</span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>"404":1}}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+<section id="make-it-pretty-with-jq-and-save" class="level3">
+<h3 class="anchored" data-anchor-id="make-it-pretty-with-jq-and-save">Make it pretty with jq and save!</h3>
+<p>The jq command reformats the JSON to look pretty. Finally, we save the final output to a JSON file.</p>
+<div class="sourceCode" id="cb28"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="co">#!/bin/bash</span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="ex">curl</span> <span class="at">--location</span> <span class="st">"https://www.lcbo.com/en/storeinventory/?sku="</span><span class="va">$1</span> <span class="dt">\</span></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span> <span class="fu">grep</span> <span class="at">-m</span> 1 <span class="st">'storeList'</span> <span class="dt">\</span></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span> <span class="fu">tac</span> <span class="kw">|</span> <span class="fu">tac</span> <span class="dt">\</span></span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span> <span class="fu">sed</span> <span class="st">'$s/,$//; s/"storeList":\[//; s/\]\]//g; s/\],\[/\n/g; /^ $/d'</span> <span class="dt">\</span></span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span> <span class="fu">tail</span> +2  <span class="dt">\</span></span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span> <span class="fu">sed</span> <span class="at">-r</span> <span class="st">'s/(.*,)([^,]+,[^,]+)$/\2/g; s/"*$//g; s/","/":/g ; 1s/^/{"'</span><span class="va">$1</span><span class="st">'":{/; s/$/,/ ; $s/,$/}}/'</span> <span class="dt">\</span></span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a><span class="kw">|</span> <span class="ex">jq</span> . <span class="dt">\</span></span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;</span> json/inventory/<span class="va">$1</span>.json</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+</section>
+<section id="loop-the-script-for-each-sku-number" class="level2">
+<h2 class="anchored" data-anchor-id="loop-the-script-for-each-sku-number">Loop the script for each SKU number:</h2>
+<p>In Part 3, I obtain a list of SKU numbers for wines and non-wine beverages. In the script below, the script runs a loop for each SKU number in the file and executes the script made above. The “chmod” command changes permissions to permit write access. We add a sleep command of 1 second to scrape more gently.</p>
+<div class="sourceCode" id="cb29"><pre class="sourceCode bash code-with-copy"><code class="sourceCode bash"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="co">#!/bin/bash</span></span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="fu">chmod</span> +x code/inventory_request.sh</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a><span class="cf">while</span> <span class="va">IFS</span><span class="op">=</span> <span class="bu">read</span> <span class="at">-r</span> <span class="va">line</span><span class="kw">;</span> <span class="cf">do</span></span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sudo</span> ./code/inventory_request.sh <span class="va">$line</span></span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sleep</span> 1</span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a><span class="cf">done</span> <span class="op">&lt;</span> json/wine_sku_list.txt</span>
+<span id="cb29-8"><a href="#cb29-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb29-9"><a href="#cb29-9" aria-hidden="true" tabindex="-1"></a><span class="cf">while</span> <span class="va">IFS</span><span class="op">=</span> <span class="bu">read</span> <span class="at">-r</span> <span class="va">line</span><span class="kw">;</span> <span class="cf">do</span></span>
+<span id="cb29-10"><a href="#cb29-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sudo</span> ./code/inventory_request.sh <span class="va">$line</span></span>
+<span id="cb29-11"><a href="#cb29-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">sleep</span> 1</span>
+<span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a><span class="cf">done</span> <span class="op">&lt;</span> json/nonwine_sku_list.txt</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</section>
+</section>
+<section id="conclusion" class="level1">
+<h1>Conclusion</h1>
+<p>I made a surprising discovery when directly webscraping the HTML code. The HTML code delivered via the cURL command contained the inventory table as a JSON in text format. This let us write a few lines of code to extract the data. If this were not the case, I would have either written dozens of regex code or generated a browser in python to download the blob URL. Fortunately, I found a cleaner solution!</p>
+
+
+</section>
+
+<div id="quarto-appendix" class="default"><section class="quarto-appendix-contents"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{ro2023,
+  author = {Ro, Stephen},
+  title = {Scraping {LCBO} {Data} {(Part} 2: {Product} {Inventory)}},
+  date = {2023-06-10},
+  url = {https://royourboat.github.io/posts/2023-06-10-lcbo-scraper/},
+  langid = {en}
+}
+</code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-ro2023" class="csl-entry quarto-appendix-citeas" role="listitem">
+Ro, Stephen. 2023. <span>“Scraping LCBO Data (Part 2: Product
+Inventory).”</span> June 10, 2023. <a href="https://royourboat.github.io/posts/2023-06-10-lcbo-scraper/">https://royourboat.github.io/posts/2023-06-10-lcbo-scraper/</a>.
+</div></div></section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const disableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'prefetch';
+    }
+  }
+  const enableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'stylesheet';
+    }
+  }
+  const manageTransitions = (selector, allowTransitions) => {
+    const els = window.document.querySelectorAll(selector);
+    for (let i=0; i < els.length; i++) {
+      const el = els[i];
+      if (allowTransitions) {
+        el.classList.remove('notransition');
+      } else {
+        el.classList.add('notransition');
+      }
+    }
+  }
+  const toggleColorMode = (alternate) => {
+    // Switch the stylesheets
+    const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+    manageTransitions('#quarto-margin-sidebar .nav-link', false);
+    if (alternate) {
+      enableStylesheet(alternateStylesheets);
+      for (const sheetNode of alternateStylesheets) {
+        if (sheetNode.id === "quarto-bootstrap") {
+          toggleBodyColorMode(sheetNode);
+        }
+      }
+    } else {
+      disableStylesheet(alternateStylesheets);
+      toggleBodyColorPrimary();
+    }
+    manageTransitions('#quarto-margin-sidebar .nav-link', true);
+    // Switch the toggles
+    const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+    for (let i=0; i < toggles.length; i++) {
+      const toggle = toggles[i];
+      if (toggle) {
+        if (alternate) {
+          toggle.classList.add("alternate");     
+        } else {
+          toggle.classList.remove("alternate");
+        }
+      }
+    }
+    // Hack to workaround the fact that safari doesn't
+    // properly recolor the scrollbar when toggling (#1455)
+    if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+      manageTransitions("body", false);
+      window.scrollTo(0, 1);
+      setTimeout(() => {
+        window.scrollTo(0, 0);
+        manageTransitions("body", true);
+      }, 40);  
+    }
+  }
+  const isFileUrl = () => { 
+    return window.location.protocol === 'file:';
+  }
+  const hasAlternateSentinel = () => {  
+    let styleSentinel = getColorSchemeSentinel();
+    if (styleSentinel !== null) {
+      return styleSentinel === "alternate";
+    } else {
+      return false;
+    }
+  }
+  const setStyleSentinel = (alternate) => {
+    const value = alternate ? "alternate" : "default";
+    if (!isFileUrl()) {
+      window.localStorage.setItem("quarto-color-scheme", value);
+    } else {
+      localAlternateSentinel = value;
+    }
+  }
+  const getColorSchemeSentinel = () => {
+    if (!isFileUrl()) {
+      const storageValue = window.localStorage.getItem("quarto-color-scheme");
+      return storageValue != null ? storageValue : localAlternateSentinel;
+    } else {
+      return localAlternateSentinel;
+    }
+  }
+  let localAlternateSentinel = 'default';
+  // Dark / light mode switch
+  window.quartoToggleColorScheme = () => {
+    // Read the current dark / light value 
+    let toAlternate = !hasAlternateSentinel();
+    toggleColorMode(toAlternate);
+    setStyleSentinel(toAlternate);
+  };
+  // Ensure there is a toggle, if there isn't float one in the top right
+  if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+    const a = window.document.createElement('a');
+    a.classList.add('top-right');
+    a.classList.add('quarto-color-scheme-toggle');
+    a.href = "";
+    a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+    const i = window.document.createElement("i");
+    i.classList.add('bi');
+    a.appendChild(i);
+    window.document.body.appendChild(a);
+  }
+  // Switch to dark mode if need be
+  if (hasAlternateSentinel()) {
+    toggleColorMode(true);
+  } else {
+    toggleColorMode(false);
+  }
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>
