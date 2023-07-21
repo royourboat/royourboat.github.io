@@ -1,0 +1,1665 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.3.433">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+<meta name="author" content="Stephen Ro">
+<meta name="dcterms.date" content="2023-07-06">
+<meta name="description" content="A peek into a LOT of reviews with NLP tools.">
+
+<title>Stephen Ro - 31 Million Wine Reviews</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+</style>
+
+
+<script src="../../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../../">
+<script src="../../site_libs/quarto-html/quarto.js"></script>
+<script src="../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../../site_libs/quarto-html/quarto-syntax-highlighting-dark.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<script src="../../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../../site_libs/bootstrap/bootstrap.min.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../../site_libs/bootstrap/bootstrap-dark.min.css" rel="prefetch" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<script id="quarto-search-options" type="application/json">{
+  "location": "navbar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "end",
+  "type": "overlay",
+  "limit": 20,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" integrity="sha512-c3Nl8+7g4LMSTdrm621y7kf9v3SDPnhxLNhcjFJbKECVnmZHTdo+IRO05sNLTH/D3vA6u1X32ehoLC7WFVdheg==" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
+<script type="application/javascript">define('jquery', [],function() {return window.jQuery;})</script>
+
+
+<link rel="stylesheet" href="../../styles.css">
+</head>
+
+<body class="nav-fixed">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+      <div class="navbar-container container-fluid">
+      <div class="navbar-brand-container">
+    <a class="navbar-brand" href="../../index.html">
+    <span class="navbar-title">Stephen Ro</span>
+    </a>
+  </div>
+            <div id="quarto-search" class="" title="Search"></div>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+  <span class="navbar-toggler-icon"></span>
+</button>
+          <div class="collapse navbar-collapse" id="navbarCollapse">
+            <ul class="navbar-nav navbar-nav-scroll ms-auto">
+  <li class="nav-item">
+    <a class="nav-link" href="../../index.html" rel="" target="">
+ <span class="menu-text">Home</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../about.html" rel="" target="">
+ <span class="menu-text">About</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../posts.html" rel="" target="">
+ <span class="menu-text">Blog</span></a>
+  </li>  
+  <li class="nav-item">
+    <a class="nav-link" href="../../resume/stephen_ro_resume.pdf" rel="" target="">
+ <span class="menu-text">Resume</span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://github.com/royourboat" rel="" target=""><i class="bi bi-github" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="https://www.linkedin.com/in/stephenro/" rel="" target=""><i class="bi bi-linkedin" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+  <li class="nav-item compact">
+    <a class="nav-link" href="mailto:stephensro@gmail.com" rel="" target=""><i class="bi bi-envelope" role="img">
+</i> 
+ <span class="menu-text"></span></a>
+  </li>  
+</ul>
+            <div class="quarto-navbar-tools">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+          </div> <!-- /navcollapse -->
+      </div> <!-- /container-fluid -->
+    </nav>
+</header>
+<!-- content -->
+<header id="title-block-header" class="quarto-title-block default page-columns page-full">
+  <div class="quarto-title-banner page-columns page-full">
+    <div class="quarto-title column-body">
+      <h1 class="title">31 Million Wine Reviews</h1>
+                  <div>
+        <div class="description">
+          A peek into a LOT of reviews with NLP tools.
+        </div>
+      </div>
+                          <div class="quarto-categories">
+                <div class="quarto-category">Python</div>
+                <div class="quarto-category">JSON</div>
+                <div class="quarto-category">NLP</div>
+                <div class="quarto-category">PostgreSQL</div>
+              </div>
+                  </div>
+  </div>
+    
+  
+  <div class="quarto-title-meta">
+
+      <div>
+      <div class="quarto-title-meta-heading">Author</div>
+      <div class="quarto-title-meta-contents">
+               <p><a href="https://royourboat.github.io/">Stephen Ro</a> </p>
+            </div>
+    </div>
+      
+      <div>
+      <div class="quarto-title-meta-heading">Published</div>
+      <div class="quarto-title-meta-contents">
+        <p class="date">July 6, 2023</p>
+      </div>
+    </div>
+    
+      
+    </div>
+    
+  
+  </header><div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article page-navbar">
+<!-- sidebar -->
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">On this page</h2>
+   
+  <ul>
+  <li><a href="#background" id="toc-background" class="nav-link active" data-scroll-target="#background">Background</a></li>
+  <li><a href="#the-reviews" id="toc-the-reviews" class="nav-link" data-scroll-target="#the-reviews">The Reviews</a>
+  <ul class="collapse">
+  <li><a href="#header" id="toc-header" class="nav-link" data-scroll-target="#header">1. Header</a></li>
+  <li><a href="#ratings" id="toc-ratings" class="nav-link" data-scroll-target="#ratings">2. Ratings</a></li>
+  <li><a href="#reviews" id="toc-reviews" class="nav-link" data-scroll-target="#reviews">3. Reviews</a>
+  <ul class="collapse">
+  <li><a href="#text" id="toc-text" class="nav-link" data-scroll-target="#text">Text</a></li>
+  </ul></li>
+  <li><a href="#users" id="toc-users" class="nav-link" data-scroll-target="#users">4. Users</a>
+  <ul class="collapse">
+  <li><a href="#likes-and-comments" id="toc-likes-and-comments" class="nav-link" data-scroll-target="#likes-and-comments">Likes and Comments</a></li>
+  <li><a href="#bots" id="toc-bots" class="nav-link" data-scroll-target="#bots">Bots?</a></li>
+  <li><a href="#vivino-users" id="toc-vivino-users" class="nav-link" data-scroll-target="#vivino-users">Vivino Users</a></li>
+  </ul></li>
+  <li><a href="#wine-notes" id="toc-wine-notes" class="nav-link" data-scroll-target="#wine-notes">Wine Notes</a></li>
+  </ul></li>
+  <li><a href="#next-steps" id="toc-next-steps" class="nav-link" data-scroll-target="#next-steps">Next Steps</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content quarto-banner-title-block" id="quarto-document-content">
+
+
+
+
+<section id="background" class="level1">
+<h1>Background</h1>
+<p><a href="https://www.vivino.com/">Vivino</a> is a very popular wine app containing millions of wines. Many wines have over 100k+ reviews!</p>
+<p>I noticed approximately 0.5% (~1 in 200) of reviews contain the price a user paid and their sentiment for that price. An example of reviews with “price-sentiment” are shown in the diagram below.</p>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="index_files/figure-html/1f5b4ae3-1-price_sentiment_diagram.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">An overview of my price-sentiment algorithm.</figcaption>
+</figure>
+</div>
+<p>My idea is to crowdsource price-sentiments to judge whether the price of wine set by my liquor store is good or not.</p>
+<p>For example, suppose the LCBO (my liquor store) sells a particular bottle for $13.99. I look at all of Vivino’s reviews for the bottle and find users who:</p>
+<ul>
+<li>paid <span style="font-weight:bold">more</span> than $13.99 and <span style="color:green;">liked</span> the price</li>
+<li>paid <span style="font-weight:bold">less</span> than $13.99 and <span style="color:red;">disliked</span> the price</li>
+</ul>
+<p>This requires a large number of reviews to:</p>
+<ul>
+<li>Train a machine learning algorithm</li>
+<li>Decide whether a bottle has a “good” price</li>
+</ul>
+<p>So, I scraped thousands of wine products from the LCBO website! I matched them to bottles on Vivino and gently downloaded about 6 million corresponding reviews. Both the LCBO and Vivino datasets are hosted on my local PostgreSQL database for fast querying.</p>
+<p>I continued to gently amass 31 million reviews. This blog looks at the first partition of tables consisting of 11M reviews.</p>
+</section>
+<section id="the-reviews" class="level1">
+<h1>The Reviews</h1>
+<section id="header" class="level2">
+<h2 class="anchored" data-anchor-id="header">1. Header</h2>
+<div class="cell" data-execution_count="3">
+<details>
+<summary>Code: get number of reviews</summary>
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>q <span class="op">=</span> <span class="st">"""</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="st">SELECT COUNT(*) as count</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="st">FROM vivino</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="st">GROUP BY vivino_id</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="st">;</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>numReviews <span class="op">=</span> <span class="bu">sum</span>(pd.read_sql(q, sql_address)[<span class="st">'count'</span>])</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>numWines <span class="op">=</span> <span class="bu">len</span>(pd.read_sql(q, sql_address)[<span class="st">'count'</span>])</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Total number of reviews: </span><span class="sc">{</span>numReviews<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Total number of wines: </span><span class="sc">{</span>numWines<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Total number of reviews: 11214793
+Total number of wines: 12845</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="4">
+<details>
+<summary>Code: get number of reviews from extras table</summary>
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>q <span class="op">=</span> <span class="st">"""</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="st">SELECT COUNT(*) as count</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="st">FROM vivino_extra</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="st">GROUP BY vivino_id</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="st">;</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>numReviews <span class="op">=</span> <span class="bu">sum</span>(pd.read_sql(q, sql_address)[<span class="st">'count'</span>])</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>numWines <span class="op">=</span> <span class="bu">len</span>(pd.read_sql(q, sql_address)[<span class="st">'count'</span>])</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">"Note: From extra table not used in this analysis:"</span>)</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Total number of reviews: </span><span class="sc">{</span>numReviews<span class="sc">}</span><span class="ss">"</span>)</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f"Total number of wines: </span><span class="sc">{</span>numWines<span class="sc">}</span><span class="ss">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Note: From extra table not used in this analysis:
+Total number of reviews: 20134847
+Total number of wines: 49517</code></pre>
+</div>
+</div>
+<div class="cell" data-execution_count="67">
+<details>
+<summary>Code: get SQL table features</summary>
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> IPython.display <span class="im">import</span> Markdown</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> tabulate <span class="im">import</span> tabulate</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>q <span class="op">=</span> <span class="st">"""</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="st">SELECT column_name</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="st">FROM information_schema.columns</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="st">WHERE table_schema = 'public'</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="st">AND table_name   = 'vivino'</span></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="st">;</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span></span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>colNames <span class="op">=</span> pd.read_sql(q, sql_address)[<span class="st">'column_name'</span>]</span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>ncolHalf <span class="op">=</span> <span class="bu">int</span>(<span class="bu">len</span>(colNames)<span class="op">/</span><span class="dv">2</span>)</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>Markdown(tabulate(</span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>  <span class="bu">list</span>(<span class="bu">zip</span>(colNames[<span class="dv">0</span>:ncolHalf], colNames[ncolHalf:])), </span>
+<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>  headers<span class="op">=</span>[<span class="st">"Feature names"</span>,<span class="st">"Feature names (cont'd)"</span>]</span>
+<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="67">
+<table class="table table-sm table-striped small">
+<caption>Features per Vivino review </caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Feature names</th>
+<th style="text-align: left;">Feature names (cont’d)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">review_id</td>
+<td style="text-align: left;">user_id</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">vivino_id</td>
+<td style="text-align: left;">user_seo_name</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">rating</td>
+<td style="text-align: left;">is_featured</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">review</td>
+<td style="text-align: left;">is_premium</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">language</td>
+<td style="text-align: left;">user_followers_count</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">created_at</td>
+<td style="text-align: left;">user_followings_count</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">likes_count</td>
+<td style="text-align: left;">user_ratings_count</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">comments_count</td>
+<td style="text-align: left;">user_ratings_sum</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">flavors</td>
+<td style="text-align: left;">user_reviews_count</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<section id="ratings" class="level2">
+<h2 class="anchored" data-anchor-id="ratings">2. Ratings</h2>
+<section id="all-ratings-with-reviews" class="level4">
+<h4 class="anchored" data-anchor-id="all-ratings-with-reviews">All ratings (with reviews)</h4>
+<p>Here is a histogram of all star ratings. Most users vote in 0.5 increments (e.g., 3.5, 4.0, 4.5) rather than the finest 0.1 increments.</p>
+<div class="cell" data-execution_count="68">
+<details>
+<summary>Code: get SQL table and plot ratings</summary>
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>q <span class="op">=</span> <span class="st">"""</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="st">SELECT rating</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="st">FROM vivino</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="st">;</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>tbl <span class="op">=</span> pd.read_sql(q, sql_address)</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>plt.hist(tbl[<span class="st">'rating'</span>], bins<span class="op">=</span><span class="dv">81</span>)</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'Star Rating'</span>)</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Count (millions)'</span>)</span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Distribution of Star Ratings'</span>)</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>plt.xlim(<span class="fl">0.95</span>,<span class="fl">5.05</span>)</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display">
+<p><img src="index_files/figure-html/cell-6-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+<p>There are reviews with low ratings! Here is a log-y plot.</p>
+<div class="cell">
+<details>
+<summary>Code: plot histogram of ratings</summary>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>plt.hist(tbl[<span class="st">'rating'</span>], bins<span class="op">=</span><span class="dv">81</span>, log<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'Star Rating'</span>)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Count'</span>)</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Distribution of Star Ratings'</span>)</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>plt.ylim(<span class="fl">0.9</span>, <span class="fl">1e7</span>)</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>plt.xlim(<span class="fl">0.95</span>,<span class="fl">5.05</span>)</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display">
+<p><img src="index_files/figure-html/cell-7-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+<p>Let’s integrate the histogram to get a cumulative distribution.</p>
+<div class="cell">
+<details>
+<summary>Code: plot cumulative distribution of ratings</summary>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>plt.hist(tbl[<span class="st">'rating'</span>], bins<span class="op">=</span><span class="dv">81</span>, cumulative<span class="op">=</span><span class="va">True</span>, density<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'Star Rating'</span>)</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Normalized Density'</span>)</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Cumulative Distribution of Star Ratings'</span>)</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>plt.xlim(<span class="fl">0.95</span>,<span class="fl">5.05</span>)</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display">
+<p><img src="index_files/figure-html/cell-8-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+<p>The above plots clearly show the ratings are distributed in a highly irregular fashion.</p>
+<p>Looks like less than 5% of bottles are rated below 3-stars. Why?</p>
+<ul>
+<li>Theory 1: Most bottles are decent or awesome.</li>
+<li>Theory 2: Low ratings are hidden… (unlikely)</li>
+<li>Theory 3: 3 stars is considered <em>bad</em>.</li>
+<li>Theory 4: Bots.</li>
+<li>Theory 5: There are more theories but I’m not a wine expert.</li>
+</ul>
+<p>The answer is likely some combination of theories 1, 3, and 5. For instance, I would not expect many true 1-star wines to make it to market due to severe costs of production and self-destructive branding. Rather, 1-star ratings are likely from faulty/damaged bottling or storage, peculiar drinking preferences, or splitting<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a>.</p>
+<p><em>Wine Spectator’s</em> <a href="https://www.winespectator.com/articles/scoring-scale">100-point Scale</a> gives credence to Theory 3. Anything below 50-pts or 3-stars is “Not recommended” and would be a devastating review.</p>
+<p>Note: I had no impression of Theory 4 until I dug a tiny bit deeper. There are a LOT of inexplicable behaviour that would surprise me if they were human.</p>
+</section>
+<section id="average-rating-per-wine" class="level4">
+<h4 class="anchored" data-anchor-id="average-rating-per-wine">Average Rating per Wine</h4>
+<p>The distribution of the average rating per wine shows a nice demonstration of the Central Limit Theorem.</p>
+<div class="cell" data-execution_count="13">
+<details>
+<summary>Code: plot histogram of average rating per wine</summary>
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.optimize <span class="im">import</span> curve_fit</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> numpy <span class="im">as</span> np</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> gaussian(x, mu, sigma, a):</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> a<span class="op">*</span>np.exp(<span class="op">-</span><span class="fl">0.5</span><span class="op">*</span>(x<span class="op">-</span>mu)<span class="op">**</span><span class="dv">2</span><span class="op">/</span>sigma<span class="op">**</span><span class="dv">2</span>)</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>q <span class="op">=</span> <span class="st">"""</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="st">SELECT AVG(rating) as avg_rating</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="st">FROM vivino</span></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a><span class="st">GROUP BY vivino_id</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a><span class="st">;</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span></span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>tbl <span class="op">=</span> pd.read_sql(q, sql_address)</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>h <span class="op">=</span> plt.hist(tbl[<span class="st">'avg_rating'</span>], bins<span class="op">=</span><span class="dv">81</span>)</span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>xdata <span class="op">=</span> h[<span class="dv">1</span>][<span class="dv">1</span>:] <span class="op">-</span> <span class="fl">0.5</span><span class="op">*</span>np.diff(h[<span class="dv">1</span>])[<span class="dv">0</span>] <span class="co">#get center of edges.</span></span>
+<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>ydata <span class="op">=</span> h[<span class="dv">0</span>]</span>
+<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>popt, pcov <span class="op">=</span> curve_fit(gaussian, xdata, ydata, p0<span class="op">=</span>(<span class="dv">4</span>, <span class="fl">0.5</span>, <span class="dv">100</span>))</span>
+<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>plt.plot(xdata, gaussian(xdata, <span class="op">*</span>popt), </span>
+<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>         <span class="st">'r-'</span>, </span>
+<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a>         label<span class="op">=</span><span class="vs">r'Gaussian: $\mu$=</span><span class="sc">%5.3f</span><span class="vs">, $\sigma$=</span><span class="sc">%5.3f</span><span class="vs">'</span> <span class="op">%</span> <span class="bu">tuple</span>(popt[<span class="dv">0</span>:<span class="dv">2</span>]))</span>
+<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'Star Rating'</span>)</span>
+<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Count'</span>)</span>
+<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Cumulative Distribution of Star Ratings'</span>)</span>
+<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a>plt.xlim(<span class="fl">0.95</span>,<span class="fl">5.05</span>)</span>
+<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
+<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display">
+<p><img src="index_files/figure-html/cell-9-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+</section>
+</section>
+<section id="reviews" class="level2">
+<h2 class="anchored" data-anchor-id="reviews">3. Reviews</h2>
+<p>Let’s look at the distribution of reviews per wine bottle. I use log-binning to capture the granularity of wines with few reviews.</p>
+<p>A log-normal distribution with a bit of skewness is a good description. These distributions appear normal when the x-axis is logscale.</p>
+<div class="cell">
+<details>
+<summary>Code: plot histogram of reviews per bottle</summary>
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>q <span class="op">=</span> <span class="st">"""</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="st">SELECT count(*) as count</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="st">FROM vivino</span></span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="st">GROUP BY vivino_id</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="st">;</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>tbl <span class="op">=</span> pd.read_sql(q, sql_address)</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> lognormal(x, mu, sigma, a):</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> a<span class="op">*</span>np.exp(<span class="op">-</span><span class="fl">0.5</span><span class="op">*</span>(np.log(x)<span class="op">-</span>mu)<span class="op">**</span><span class="dv">2</span><span class="op">/</span>sigma<span class="op">**</span><span class="dv">2</span>) <span class="op">/</span> (x <span class="op">*</span> sigma)</span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>h <span class="op">=</span> plt.hist(tbl[<span class="st">'count'</span>], bins<span class="op">=</span>np.logspace(np.log10(<span class="dv">1</span>),<span class="dv">5</span>, <span class="dv">100</span>))</span>
+<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>xdata <span class="op">=</span> <span class="dv">10</span><span class="op">**</span>(np.log10(h[<span class="dv">1</span>])[<span class="dv">1</span>:] <span class="op">-</span> <span class="fl">0.5</span><span class="op">*</span>np.diff(np.log10(h[<span class="dv">1</span>]))[<span class="dv">0</span>])</span>
+<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>ydata <span class="op">=</span> h[<span class="dv">0</span>]</span>
+<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>popt, pcov <span class="op">=</span> curve_fit(lognormal, xdata, ydata, p0<span class="op">=</span>(<span class="dv">250</span>, <span class="dv">50</span>, <span class="dv">100</span>))</span>
+<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>plt.plot(xdata, lognormal(xdata, <span class="op">*</span>popt), </span>
+<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>         <span class="st">'r-'</span>, </span>
+<span id="cb10-20"><a href="#cb10-20" aria-hidden="true" tabindex="-1"></a>         label<span class="op">=</span><span class="vs">r'Log-Normal: $\mu$=</span><span class="sc">%5.3f</span><span class="vs">, $\sigma$=</span><span class="sc">%5.3f</span><span class="vs">'</span> <span class="op">%</span> <span class="bu">tuple</span>(popt[<span class="dv">0</span>:<span class="dv">2</span>]))</span>
+<span id="cb10-21"><a href="#cb10-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-22"><a href="#cb10-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-23"><a href="#cb10-23" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'Number of reviews per wine'</span>)</span>
+<span id="cb10-24"><a href="#cb10-24" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Count'</span>)</span>
+<span id="cb10-25"><a href="#cb10-25" aria-hidden="true" tabindex="-1"></a>plt.xscale(<span class="st">'log'</span>)</span>
+<span id="cb10-26"><a href="#cb10-26" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="ss">f'Distribution of Reviews per Wine'</span>)</span>
+<span id="cb10-27"><a href="#cb10-27" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display">
+<p><img src="index_files/figure-html/cell-10-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+<p>Most wines have between 50 to 500 reviews each. The peak is at ~250 reviews per bottle.</p>
+<p>Earlier, I stated approximately 0.5% or 1-in-200 of reviews have price-sentiments (i.e., the reviews that I want). Let’s say we need 10 price-sentiments to have an interesting signal. Then only bottles with 2,000+ reviews will likely the signal I desire. From the cumulative distribution below, that is approximately 15% of bottles.</p>
+<div class="cell">
+<details>
+<summary>Code: plot cumulative distribution of reviews per bottle</summary>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>h <span class="op">=</span> plt.hist(tbl[<span class="st">'count'</span>], bins<span class="op">=</span>np.logspace(np.log10(<span class="dv">1</span>),<span class="dv">5</span>, <span class="dv">100</span>), cumulative<span class="op">=</span><span class="va">True</span>, density<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'Number of reviews per wine'</span>)</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Cumulative number of wines'</span>)</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>plt.xscale(<span class="st">'log'</span>)</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="ss">f'Cumulative Distribution of Reviews per Wine'</span>)</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>plt.axvline(<span class="dv">2000</span>, c <span class="op">=</span> <span class="st">'r'</span>)</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display">
+<p><img src="index_files/figure-html/cell-11-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+<p>The above figure is for the entire dataset which includes wines I am not able to purchase at my liquor store. If I exclude those wines, I find approximately 450 bottles purchasable at our liquor stores have over 2,000 reviews. This suggests there are plenty of purchasable wines to build a wine recommendation app based on price-sentiment.</p>
+<div class="cell">
+<details>
+<summary>Code: plot cumulative distribution of reviews per bottle from LCBO</summary>
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>q <span class="op">=</span> <span class="st">"""</span></span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="st">SELECT count(*)  FROM (</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="st">    SELECT vivid2 FROM (</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="st">        SELECT sku, vivid2 FROM index_matches</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="st">        WHERE sku IS NOT null</span></span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="st">        AND vivid1 IS NOT null</span></span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a><span class="st">        AND vivid2 IS NOT null</span></span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a><span class="st">        ) AS matches</span></span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a><span class="st">    INNER JOIN (</span></span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a><span class="st">        SELECT sku FROM inventory</span></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a><span class="st">        GROUP BY sku</span></span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a><span class="st">    ) AS buyable </span></span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a><span class="st">    ON matches.sku = buyable.sku</span></span>
+<span id="cb12-14"><a href="#cb12-14" aria-hidden="true" tabindex="-1"></a><span class="st">) AS buyable</span></span>
+<span id="cb12-15"><a href="#cb12-15" aria-hidden="true" tabindex="-1"></a><span class="st">LEFT JOIN (</span></span>
+<span id="cb12-16"><a href="#cb12-16" aria-hidden="true" tabindex="-1"></a><span class="st">    SELECT vivino_id FROM vivino</span></span>
+<span id="cb12-17"><a href="#cb12-17" aria-hidden="true" tabindex="-1"></a><span class="st">) AS vivino_reviews</span></span>
+<span id="cb12-18"><a href="#cb12-18" aria-hidden="true" tabindex="-1"></a><span class="st">ON vivid2 = vivino_id</span></span>
+<span id="cb12-19"><a href="#cb12-19" aria-hidden="true" tabindex="-1"></a><span class="st">GROUP BY vivino_id</span></span>
+<span id="cb12-20"><a href="#cb12-20" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span></span>
+<span id="cb12-21"><a href="#cb12-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-22"><a href="#cb12-22" aria-hidden="true" tabindex="-1"></a>tbl <span class="op">=</span> pd.read_sql(q, sql_address)</span>
+<span id="cb12-23"><a href="#cb12-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-24"><a href="#cb12-24" aria-hidden="true" tabindex="-1"></a>h <span class="op">=</span> plt.hist(tbl[<span class="st">'count'</span>], bins<span class="op">=</span>np.logspace(np.log10(<span class="dv">1</span>),<span class="dv">5</span>, <span class="dv">100</span>), cumulative<span class="op">=</span><span class="va">True</span>)</span>
+<span id="cb12-25"><a href="#cb12-25" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'Number of reviews per wine'</span>)</span>
+<span id="cb12-26"><a href="#cb12-26" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Cumulative number of wines'</span>)</span>
+<span id="cb12-27"><a href="#cb12-27" aria-hidden="true" tabindex="-1"></a>plt.xscale(<span class="st">'log'</span>)</span>
+<span id="cb12-28"><a href="#cb12-28" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="ss">f'Cumulative Distribution of Reviews per Wine (Purchasable at the LCBO)'</span>)</span>
+<span id="cb12-29"><a href="#cb12-29" aria-hidden="true" tabindex="-1"></a>plt.axvline(<span class="dv">2000</span>, c <span class="op">=</span> <span class="st">'r'</span>)</span>
+<span id="cb12-30"><a href="#cb12-30" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
+<span id="cb12-31"><a href="#cb12-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb12-32"><a href="#cb12-32" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'There are </span><span class="sc">{</span><span class="bu">len</span>(tbl)<span class="sc">}</span><span class="ss"> bottles available at the LCBO.'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display">
+<p><img src="index_files/figure-html/cell-12-output-1.png" class="img-fluid"></p>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>There are 1455 bottles available at the LCBO.</code></pre>
+</div>
+</div>
+<section id="text" class="level3">
+<h3 class="anchored" data-anchor-id="text">Text</h3>
+<p>Our next goal is to study the review strings such as the word and character lengths. Let’s grab a random set of 1 million reviews.</p>
+<div class="cell" data-execution_count="5">
+<details>
+<summary>Code: get 1M random reviews</summary>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> re</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>q <span class="op">=</span> <span class="st">"""</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="st">SELECT review_id, review, language FROM vivino</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a><span class="st">ORDER BY RANDOM()</span></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a><span class="st">LIMIT 1000000</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span></span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>tbl <span class="op">=</span> pd.read_sql(q, sql_address)</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a><span class="co">#delete more than one whitespace</span></span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>tbl[<span class="st">'review'</span>] <span class="op">=</span> tbl[<span class="st">'review'</span>].<span class="bu">apply</span>(<span class="kw">lambda</span> x: re.sub(<span class="st">' +'</span>, <span class="st">' '</span>, x))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+</div>
+<div class="cell" data-execution_count="12">
+<details>
+<summary>Code: plot histogram of character lengths</summary>
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>tbl[<span class="st">'charLength'</span>] <span class="op">=</span> tbl[<span class="st">'review'</span>].<span class="bu">apply</span>(<span class="bu">len</span>)</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>plt.hist(tbl[<span class="st">'charLength'</span>], bins<span class="op">=</span><span class="bu">int</span>(<span class="bu">max</span>(tbl[<span class="st">'charLength'</span>])<span class="op">/</span><span class="dv">2</span>), log <span class="op">=</span> <span class="va">True</span>)</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Distribution of Character Lengths per Review'</span>)</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Number of reviews'</span>)</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'Number of characters'</span>)</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>plt.ylim(<span class="fl">1e2</span>, <span class="fl">5e4</span>)</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>plt.show()</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">'Example of a 500+ character review:'</span>)</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(tbl[tbl[<span class="st">'charLength'</span>]<span class="op">&gt;=</span><span class="dv">500</span>][<span class="st">'review'</span>].iloc[<span class="dv">10</span>])</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display">
+<p><img src="index_files/figure-html/cell-14-output-1.png" class="img-fluid"></p>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>Example of a 500+ character review:
+👁 Garnet red
+👃 Cherry, raspberries and oak, the freshness is also very intense.
+👅 Light body, well balanced, medium finish and very soft aftertaste, I didn’t feel the acidity which is characteristic of the Pinot Noirs, which gave me a good impresion of this wine! 
+
+**Esp
+
+👁 Rojo granate
+👃 Cereza, frambuesa y roble, tambien senti una frescura intensa agradable
+👅 Cuerpo ligero, bien equilibrado, final medio y retrogusto suave. No senti la acidez caracteristica de los Pinot Noir, lo cual me agrado bastante!
+
+
+</code></pre>
+</div>
+</div>
+<p>Most users express write fewer than 100 characters. The users who express more appear as a spike in the distribution due to the 520 character limit. Very long reviews have a number of sentences and points. They often contain a story, lists of taste, smell, and sight descriptors, or common wine nomenclature (e.g., tannins, body, acidity).</p>
+<div class="cell" data-execution_count="71">
+<details>
+<summary>Code: plot histogram of word lengths</summary>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>tbl[<span class="st">'wordLength'</span>] <span class="op">=</span> tbl[<span class="st">'review'</span>].<span class="bu">apply</span>(<span class="kw">lambda</span> x: <span class="bu">len</span>(x.split(<span class="st">' '</span>)))</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>plt.hist(tbl[<span class="st">'wordLength'</span>], bins<span class="op">=</span><span class="bu">int</span>(<span class="bu">max</span>(tbl[<span class="st">'wordLength'</span>] )), log <span class="op">=</span> <span class="va">True</span>)</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Frequency of words per Review'</span>)</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Number of reviews'</span>)</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'Number of words'</span>)</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>plt.axvline(<span class="dv">520</span><span class="op">/</span><span class="fl">5.79</span>, c <span class="op">=</span> <span class="st">'k'</span>, lw<span class="op">=</span><span class="dv">1</span>, label <span class="op">=</span> <span class="st">"4.79 char. per word"</span>)</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display">
+<div id="fig-words" class="quarto-figure quarto-figure-center anchored">
+<figure class="figure">
+<p><img src="index_files/figure-html/fig-words-output-1.png" class="img-fluid figure-img"></p>
+<figcaption class="figure-caption">Figure&nbsp;1: Frequency of words in reviews</figcaption>
+</figure>
+</div>
+</div>
+</div>
+<p>A study of google books found that the average number of characters per word is 4.79 (<a href="http://norvig.com/mayzner.html">Norvig</a>). White spaces are counted in the character limit of reviews, so the average word approximately occupies 5.79 characters. The maximum number of average words in 520 characters is then 520 / 5.79 ~ 90 words, which is located at the knee in the distribution!</p>
+<p>Let’s plot see how the character and word lengths are distributed together.</p>
+<div class="cell" data-execution_count="114">
+<details>
+<summary>Code: plot character and word lengths</summary>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>plt.scatter(tbl[<span class="st">'charLength'</span>], tbl[<span class="st">'wordLength'</span>], s<span class="op">=</span> <span class="dv">1</span>, alpha<span class="op">=</span><span class="fl">0.5</span>, label<span class="op">=</span><span class="st">'language: any'</span>)</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>plt.scatter(tbl[tbl[<span class="st">'language'</span>]<span class="op">==</span>ja][<span class="st">'charLength'</span>], tbl[tbl[<span class="st">'language'</span>]<span class="op">==</span>ja][<span class="st">'wordLength'</span>], c <span class="op">=</span> <span class="st">'r'</span>, s<span class="op">=</span> <span class="dv">1</span>, alpha<span class="op">=</span><span class="fl">0.5</span>, label<span class="op">=</span><span class="st">'language: ja'</span>)</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Scatter Plot of Word and Character Lengths'</span>)</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'Number of characters'</span>)</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Number of words'</span>)</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>plt.plot([<span class="dv">0</span>,<span class="dv">520</span>], [<span class="dv">0</span>, <span class="dv">520</span><span class="op">/</span><span class="fl">5.79</span>], c <span class="op">=</span> <span class="st">'k'</span>, label <span class="op">=</span> <span class="st">"4.79 char. per word"</span>)</span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display">
+<p><img src="index_files/figure-html/cell-16-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+<p>There are clearly two sets of distributions. The dominant diagonol distribution shows most reviews contain 4.79 characters (plus 1 white space) per word, no matter the review length!</p>
+<p>The smaller distribution of reviews with a very high character-word density are either written in kanji, have numerous emojis, or are just riiiiiiiiiiiiiiiiiiidiculously long:</p>
+<div class="cell" data-execution_count="118">
+<div class="cell-output cell-output-stdout">
+<pre><code>28362     ソライア2009\nTENUTA TIGNANELLO (ANTINORI)\nテヌータ・テ...
+34597     Para comprar a cajas....\n\n\n👏👏👏👏👏👏👏👏👏👏👏👏👏\n🍷...
+146622    ブレッドアンドバター、ピノノワール2021年\n\nカリフォルニア、ナパヴァレーの人気ワイナ...
+166770    Graaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa...
+222111    Graaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa...
+234564    Graaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa...
+245968    SONOMA COAST LES NOISETIERS CHARDONNAY 2019\n\...
+271508    3,75*\n\nBuena RCP\n\n\n👏👏👏👏👏👏👏👏👏👏👏👏👏\n🍷🍷🍷🍷🍷🍷🍷...
+306546    Graaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa...
+320458    Graaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa...
+324681    サヴォワ・アプルモン・キュヴェ・ガストロノミー 2019\n\n淡いライトグリーン。ゆったり...
+335071    持って来てくれた人曰くオレンジワインらしい。\n\n外観はオレンジ色がかった強目の黄色からゴ...
+394920    ユニオン・デ・グラン・クリュ・ド・ボルドーにて。\n2019ヴィンテージ。\n\n去年の20...
+400628    グラハム・ベック・ブリュット・ロゼ NV\n\n少し紫がかった濃いピンク。決め細かな泡立ち。...
+401848    シャトー アンジェリュス\n2018.2017.2014\n\n2018、濃い紫寄りのガーネ...
+504967    自宅にて開栓。\n2015ヴィンテージ。\n\n家で2016ヴィンテージを飲んで気に入ったシ...
+542056    T持ち込みワイン会にて。\n2015ヴィンテージ。\n\n自分が持ち込みブラインドで提供した...
+559185    Graaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa...
+610415    Bic Camera¥3680\nワインショップの店員さんのお話を聞いて、ネットや雑誌では知...
+614611    Graaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa...
+Name: review, dtype: object</code></pre>
+</div>
+</div>
+<p>Hmm… There’s one user who enjoys writing reviews with very low information density.</p>
+<div class="cell" data-execution_count="128">
+<details>
+<summary>Code: get number of duplicate reviews from francisco_silva6</summary>
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>tmpID <span class="op">=</span> <span class="dv">355128697</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>q <span class="op">=</span> <span class="ss">f""" </span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="ss">SELECT count(*)</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="ss">FROM vivino </span></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a><span class="ss">WHERE review = (</span></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a><span class="ss">    SELECT review</span></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a><span class="ss">    FROM vivino</span></span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a><span class="ss">    WHERE review_id = </span><span class="sc">{</span>tmpID<span class="sc">}</span><span class="ss">  </span></span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a><span class="ss">)</span></span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a><span class="ss">AND user_seo_name='francisco_silva6' </span></span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a><span class="ss">--the name condition makes no difference</span></span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a><span class="ss">"""</span></span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a>tbl_gra <span class="op">=</span> pd.read_sql(q, sql_address)</span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f'Number of duplicates: </span><span class="sc">{</span>tbl_gra[<span class="st">"count"</span>]<span class="sc">.</span>iloc[<span class="dv">0</span>]<span class="sc">}</span><span class="ss">'</span>)</span>
+<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a>tbl[tbl[<span class="st">'review_id'</span>]<span class="op">==</span>tmpID][<span class="st">'review'</span>].iloc[<span class="dv">0</span>]</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-stdout">
+<pre><code>Number of duplicates: 131</code></pre>
+</div>
+<div class="cell-output cell-output-display" data-execution_count="128">
+<pre><code>'Graaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaande vinho'</code></pre>
+</div>
+</div>
+<p>Wow. 131 duplicates! Lots of questions. This is a good opportunity to talk about Vivino’s users.</p>
+</section>
+</section>
+<section id="users" class="level2">
+<h2 class="anchored" data-anchor-id="users">4. Users</h2>
+<section id="likes-and-comments" class="level3">
+<h3 class="anchored" data-anchor-id="likes-and-comments">Likes and Comments</h3>
+<p>Here are histograms for the number of likes and comments for a review.</p>
+<div class="cell">
+<details>
+<summary>Code: plot histogram of likes and comments per review</summary>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> math</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>q <span class="op">=</span> <span class="st">"""</span></span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a><span class="st">SELECT likes_count, comments_count</span></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a><span class="st">FROM vivino</span></span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a><span class="st">;</span></span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span></span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>tbl <span class="op">=</span> pd.read_sql(q, sql_address)</span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>binWidth <span class="op">=</span> <span class="dv">20</span></span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>maxBinsLikes <span class="op">=</span> <span class="bu">int</span>(math.ceil(<span class="bu">max</span>(tbl[<span class="st">'likes_count'</span>])<span class="op">/</span>binWidth)<span class="op">+</span><span class="dv">1</span>)<span class="op">*</span>binWidth</span>
+<span id="cb23-12"><a href="#cb23-12" aria-hidden="true" tabindex="-1"></a>maxBinsComments <span class="op">=</span> <span class="bu">int</span>(math.ceil(<span class="bu">max</span>(tbl[<span class="st">'comments_count'</span>])<span class="op">/</span>binWidth)<span class="op">+</span><span class="dv">1</span>)<span class="op">*</span>binWidth</span>
+<span id="cb23-13"><a href="#cb23-13" aria-hidden="true" tabindex="-1"></a>rangeBinsLikes <span class="op">=</span> <span class="bu">range</span>(<span class="dv">0</span>,maxBinsLikes, binWidth)</span>
+<span id="cb23-14"><a href="#cb23-14" aria-hidden="true" tabindex="-1"></a>rangeBinsComments <span class="op">=</span> <span class="bu">range</span>(<span class="dv">0</span>,maxBinsComments, binWidth)</span>
+<span id="cb23-15"><a href="#cb23-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-16"><a href="#cb23-16" aria-hidden="true" tabindex="-1"></a>plt.hist(tbl[<span class="st">'likes_count'</span>], bins<span class="op">=</span>np.logspace(np.log10(<span class="dv">1</span>),<span class="dv">4</span>, <span class="dv">100</span>), log<span class="op">=</span><span class="va">True</span>, label<span class="op">=</span><span class="st">"Likes"</span>)</span>
+<span id="cb23-17"><a href="#cb23-17" aria-hidden="true" tabindex="-1"></a>plt.hist(tbl[<span class="st">'comments_count'</span>], bins<span class="op">=</span>np.logspace(np.log10(<span class="dv">1</span>),<span class="dv">4</span>, <span class="dv">100</span>), log<span class="op">=</span><span class="va">True</span>, alpha<span class="op">=</span><span class="fl">0.5</span>, color <span class="op">=</span> <span class="st">'r'</span>, label<span class="op">=</span><span class="st">"Comments"</span>)</span>
+<span id="cb23-18"><a href="#cb23-18" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'Number of Likes, and Comments'</span>)</span>
+<span id="cb23-19"><a href="#cb23-19" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Log Count'</span>)</span>
+<span id="cb23-20"><a href="#cb23-20" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Distribution of a Review Likes and Comments'</span>)</span>
+<span id="cb23-21"><a href="#cb23-21" aria-hidden="true" tabindex="-1"></a>plt.xscale(<span class="st">'log'</span>)</span>
+<span id="cb23-22"><a href="#cb23-22" aria-hidden="true" tabindex="-1"></a>plt.legend()</span>
+<span id="cb23-23"><a href="#cb23-23" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display">
+<p><img src="index_files/figure-html/cell-19-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+<p>From experience, it makes sense that there are fewer comments than likes<a href="#fn2" class="footnote-ref" id="fnref2" role="doc-noteref"><sup>2</sup></a> and that most reviews do not have many likes. There are ~100 reviews that have over 500 likes, which is impressive. Here are a few samples:</p>
+<div class="cell" data-execution_count="77">
+<div class="cell-output cell-output-stdout">
+<pre><code>Splendid Umbrian blend of 70% Merlot, 20% CS and 10% CF, originating from vineyards located on the Spello and Assisi hills, aged for 12m in French barriques and another 24m in the bottle.  
+Inky dark red, displaying scents of blueberries, blackberries, laurel, sweet almonds, smoky cedar and bitter dark chocolate refined with a whiff of mint.  
+Despite its age still very grippy, showing firm tannins that structure a dense core of  fresh and juicy dark fruit with clear hints of pepper in the finisch.  
+4.0*
+--------------------------------
+⭐️ 90 P/ 4.0* Very nice aged Tawny Port. Typical for the style, with a good complexity and concentration. Can stand alone or with food (e.g. cheese).
+ 
+👁 Pale tawny.
+ 
+👃 Intense nose of tertiary flavors – raisins, tobacco, leather, cedar, roasted nuts, milk chocolate, butterscotch, rum infused berries, dates, cooked red and black berries.
+ 
+👅 Half-sweet with a med+ acidity. High in alcohol with med and ripe tannins. The body is med+. The finish is dominated by fruity-tertiary notes and is med+ long.
+--------------------------------
+Merlot 55%+ syrah 35%+sangiovese 10%
+Tonneau 12 months
+At nose is quite complex: blackberry, blueberry, vanilla, cocoa, red flowers.
+Rich tannins and good texture in mouth.
+Good persistency with licorice notes. 
+--------------------------------</code></pre>
+</div>
+</div>
+</section>
+<section id="bots" class="level3">
+<h3 class="anchored" data-anchor-id="bots">Bots?</h3>
+<p>It is shocking that there are reviews with more than a few hundred comments! That sounds busier than a controversial tweet. How can a review have over 2000 or 5000 comments?? Let’s take a peek.</p>
+<div class="cell" data-execution_count="103">
+<details>
+<summary>Code: select reviews with over 400 comments</summary>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a>q <span class="op">=</span> <span class="st">"""</span></span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a><span class="st">SELECT comments_count as comments, likes_count as likes, review, user_seo_name as name, user_followers_count as followers, user_followings_count as followings</span></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a><span class="st">FROM vivino</span></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a><span class="st">WHERE comments_count &gt; 400</span></span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a><span class="st">ORDER BY comments_count</span></span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a><span class="st">;</span></span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span></span>
+<span id="cb25-8"><a href="#cb25-8" aria-hidden="true" tabindex="-1"></a>tbl <span class="op">=</span> pd.read_sql(q, sql_address)</span>
+<span id="cb25-9"><a href="#cb25-9" aria-hidden="true" tabindex="-1"></a>tbl</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="103">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">comments</th>
+<th data-quarto-table-cell-role="th">likes</th>
+<th data-quarto-table-cell-role="th">review</th>
+<th data-quarto-table-cell-role="th">name</th>
+<th data-quarto-table-cell-role="th">followers</th>
+<th data-quarto-table-cell-role="th">followings</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>405</td>
+<td>205</td>
+<td>They say you will always remember your first, ...</td>
+<td>kelley_do</td>
+<td>5997</td>
+<td>2042</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>411</td>
+<td>13</td>
+<td>Schäumig wie‘s sein soll. Ansonsten sehr üppig...</td>
+<td>luigi.pietronello</td>
+<td>102</td>
+<td>254</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>433</td>
+<td>3</td>
+<td>Wawww</td>
+<td>ademar.ju</td>
+<td>57</td>
+<td>57</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>446</td>
+<td>234</td>
+<td>Rich modern style that incorporates classic Ri...</td>
+<td>akarter</td>
+<td>5886</td>
+<td>147</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>520</td>
+<td>1</td>
+<td>Good wine!</td>
+<td>alessandra.fag</td>
+<td>14</td>
+<td>20</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">5</td>
+<td>547</td>
+<td>514</td>
+<td>A fantastic Syrah, deep black color, deep anim...</td>
+<td>scorewine</td>
+<td>16646</td>
+<td>242</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">6</td>
+<td>676</td>
+<td>4</td>
+<td>Vin blanc très sucré, véritablement de l'or en...</td>
+<td>alexandre.yi</td>
+<td>37</td>
+<td>31</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">7</td>
+<td>1848</td>
+<td>0</td>
+<td>Very very Nice amarone. Fruitful and full with...</td>
+<td>m58cb20b86fe892ae6f5543f9e9b2c8c</td>
+<td>0</td>
+<td>0</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">8</td>
+<td>5073</td>
+<td>0</td>
+<td>Very very nice sauternes.</td>
+<td>m58cb20b86fe892ae6f5543f9e9b2c8c</td>
+<td>0</td>
+<td>0</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>Weird! It looks like <strong>m58cb20b86fe892ae6f5543f9e9b2c8c</strong> is a bot or experiment. Their <a href="https://www.vivino.com/users/m58cb20b86fe892ae6f5543f9e9b2c8c">profile</a> shows some reviews with over 5,000 comments and zero likes. Here are comments for one of them:</p>
+<p><img src="index_files/figure-html/a7d6b369-1-650d2dd0b8af578397c2e3047fb1da9f.png" class="img-fluid"></p>
+<p>User <a href="https://www.vivino.com/users/ademar.ju"><strong>ademar.ju</strong></a> has reviewed 24 bottles which have single-digit likes, hundreds of comments each, all of which are written by <strong>Leonel de Paula</strong>. <a href="https://www.vivino.com/users/leonel.de-paula">Leonel de Paula</a> also comments on their own wine reviews with emojis, and tags other users.</p>
+<p><img src="index_files/figure-html/3dce2a89-1-7501fe45aaa6a3470dd040b4e28dd1c4.png" class="img-fluid"></p>
+<p>Some users like <strong><a href="https://www.vivino.com/users/kelley_do">kelley_do</a></strong> and <strong><a href="https://www.vivino.com/users/scorewine">scorewine</a></strong> appear to be real people with strong passions for wine.</p>
+<p>There is a lot more I can say about these bots on Vivino that I will say in my next blog post. For now, I do not find any reviews from suspected bots with prices in them. This suggests that my work on price-sentiments is unlikely to suffer from bots generating fake reviews.</p>
+</section>
+<section id="vivino-users" class="level3">
+<h3 class="anchored" data-anchor-id="vivino-users">Vivino Users</h3>
+<p>There are five numeric features for each user:</p>
+<ol type="1">
+<li>Followers: People who follow the user.</li>
+<li>Followings<a href="#fn3" class="footnote-ref" id="fnref3" role="doc-noteref"><sup>3</sup></a>: People who the user follows.</li>
+<li>Ratings count: Total number of ratings from the user.</li>
+<li>Ratings sum: Sum of all of user’s ratings.</li>
+<li>Reviews count: Total number of reviews authored from the user.</li>
+</ol>
+<section id="user-connections" class="level4">
+<h4 class="anchored" data-anchor-id="user-connections">User connections:</h4>
+<p>Let’s see how reviewers are connected to their communities.</p>
+<div class="cell" data-execution_count="37">
+<details>
+<summary>Code: plot followers vs.&nbsp;participation</summary>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a>q <span class="op">=</span> <span class="st">""" </span></span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a><span class="st">SELECT user_followers_count, user_followings_count</span></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a><span class="st">FROM vivino </span></span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span></span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>tbl <span class="op">=</span> pd.read_sql(q, sql_address)</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb26-7"><a href="#cb26-7" aria-hidden="true" tabindex="-1"></a>plt.scatter(tbl[<span class="st">'user_followers_count'</span>], tbl[<span class="st">'user_followings_count'</span>], s<span class="op">=</span> <span class="dv">1</span>, alpha<span class="op">=</span><span class="fl">0.5</span>)</span>
+<span id="cb26-8"><a href="#cb26-8" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Reviewer Connections'</span>)</span>
+<span id="cb26-9"><a href="#cb26-9" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'Number of followers    (celebrity status --&gt;)'</span>)</span>
+<span id="cb26-10"><a href="#cb26-10" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Number of followings    (watcher status --&gt;)'</span>)</span>
+<span id="cb26-11"><a href="#cb26-11" aria-hidden="true" tabindex="-1"></a>plt.xscale(<span class="st">'log'</span>)</span>
+<span id="cb26-12"><a href="#cb26-12" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display">
+<p><img src="index_files/figure-html/cell-22-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+<p>Wow! There’s a peculiar vase distribution. First, there’s some sort of uneven cap on the maximum number of people a reviewer can follow. The massive void on the left is striking and the reason is unclear just from this data. At the very least, it shows that you might be able to make connections just by following people. There is a lot of structure here that I will try to dig deeper in another post.</p>
+</section>
+<section id="participation" class="level4">
+<h4 class="anchored" data-anchor-id="participation">Participation</h4>
+<p>Let’s define a crude participation metric that equals the number of reviews authored plus ratings given. Then, plot this against the number of followers. (Yes, the results inherently ignore all Vivino users who do not write reviews).</p>
+<div class="cell" data-execution_count="53">
+<details>
+<summary>Code: plot followers vs.&nbsp;participation</summary>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>q <span class="op">=</span> <span class="st">""" </span></span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a><span class="st">SELECT user_followers_count, user_followings_count, user_reviews_count, user_ratings_count, user_seo_name</span></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a><span class="st">FROM vivino </span></span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span></span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>tbl <span class="op">=</span> pd.read_sql(q, sql_address)</span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>plt.scatter(tbl[<span class="st">'user_followers_count'</span>], tbl[<span class="st">'user_reviews_count'</span>]<span class="op">+</span>tbl[<span class="st">'user_reviews_count'</span>], s<span class="op">=</span> <span class="dv">1</span>, alpha<span class="op">=</span><span class="fl">0.5</span>)</span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>plt.title(<span class="st">'Writer Followers'</span>)</span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>plt.xlabel(<span class="st">'Number of followers'</span>)</span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a>plt.ylabel(<span class="st">'Number of authored reviews + ratings'</span>)</span>
+<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a>plt.xscale(<span class="st">'log'</span>)</span>
+<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a>plt.yscale(<span class="st">'log'</span>)</span>
+<span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a>plt.show()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display">
+<p><img src="index_files/figure-html/cell-23-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+<p>There is a loose correlation between a user’s participation in reviews and ratings, and their follower count. My attention is drawn to the bottom where users have huge followings and participate very little. Let’s look at some of them:</p>
+<div class="cell" data-execution_count="129">
+<details>
+<summary>Code</summary>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a>q <span class="op">=</span> <span class="st">""" </span></span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a><span class="st">SELECT user_followers_count as followers, user_followings_count as followings, user_ratings_count as ratings, user_reviews_count as reviews, user_seo_name as username</span></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a><span class="st">FROM vivino </span></span>
+<span id="cb28-4"><a href="#cb28-4" aria-hidden="true" tabindex="-1"></a><span class="st">WHERE user_reviews_count + user_ratings_count &lt;= 4</span></span>
+<span id="cb28-5"><a href="#cb28-5" aria-hidden="true" tabindex="-1"></a><span class="st">AND user_followers_count &gt; 200</span></span>
+<span id="cb28-6"><a href="#cb28-6" aria-hidden="true" tabindex="-1"></a><span class="st">ORDER BY user_followers_count</span></span>
+<span id="cb28-7"><a href="#cb28-7" aria-hidden="true" tabindex="-1"></a><span class="st">"""</span></span>
+<span id="cb28-8"><a href="#cb28-8" aria-hidden="true" tabindex="-1"></a>tbl_bot <span class="op">=</span> pd.read_sql(q, sql_address)</span>
+<span id="cb28-9"><a href="#cb28-9" aria-hidden="true" tabindex="-1"></a>tbl_bot</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output cell-output-display" data-execution_count="129">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">followers</th>
+<th data-quarto-table-cell-role="th">followings</th>
+<th data-quarto-table-cell-role="th">ratings</th>
+<th data-quarto-table-cell-role="th">reviews</th>
+<th data-quarto-table-cell-role="th">username</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">0</td>
+<td>210</td>
+<td>409</td>
+<td>1</td>
+<td>1</td>
+<td>roberto.campane</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1</td>
+<td>218</td>
+<td>224</td>
+<td>2</td>
+<td>2</td>
+<td>m7748f668dbdc131b7330298a3f91cb3</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2</td>
+<td>228</td>
+<td>63</td>
+<td>2</td>
+<td>1</td>
+<td>eduardo_silves</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3</td>
+<td>267</td>
+<td>0</td>
+<td>1</td>
+<td>1</td>
+<td>gabriel-moo</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">4</td>
+<td>287</td>
+<td>257</td>
+<td>2</td>
+<td>2</td>
+<td>junior-ma</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">5</td>
+<td>292</td>
+<td>517</td>
+<td>1</td>
+<td>1</td>
+<td>m778d4a83c4adc3c41786c1a8f45d28a</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">6</td>
+<td>300</td>
+<td>293</td>
+<td>2</td>
+<td>2</td>
+<td>eva_bel</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">7</td>
+<td>528</td>
+<td>85</td>
+<td>1</td>
+<td>1</td>
+<td>tino.ma</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>Ah ha! The mysterious <strong>m7748f668dbdc131b7330298a3f91cb3</strong> users.</p>
+</section>
+<section id="usernames" class="level4">
+<h4 class="anchored" data-anchor-id="usernames">Usernames</h4>
+<p>I suspect the number of bots to be quite high. But, this is quite difficult to determine definitively without access to a user’s detailed logs. A potential gauge is number of characters in a username.</p>
+<div class="cell" data-execution_count="236">
+<div class="cell-output cell-output-display">
+<p><img src="index_files/figure-html/cell-25-output-1.png" class="img-fluid"></p>
+</div>
+</div>
+<p>Woah! I wasn’t expecting a sizable number of users have the max length for usernames. To be fair, I’ve never asked myself that before. Let’s take a look at some of the names.</p>
+<div class="cell" data-execution_count="235">
+<div class="cell-output cell-output-display" data-execution_count="235">
+<div>
+
+
+<table class="dataframe table table-sm table-striped small" data-quarto-postprocess="true" data-border="1">
+<thead>
+<tr class="header">
+<th data-quarto-table-cell-role="th"></th>
+<th data-quarto-table-cell-role="th">followers</th>
+<th data-quarto-table-cell-role="th">followings</th>
+<th data-quarto-table-cell-role="th">num_reviews</th>
+<th data-quarto-table-cell-role="th">num_ratings</th>
+<th data-quarto-table-cell-role="th">username</th>
+<th data-quarto-table-cell-role="th">len_name</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">2074247</td>
+<td>0</td>
+<td>0</td>
+<td>11</td>
+<td>12</td>
+<td>edu.gaytan.eduardo101-gmail.com</td>
+<td>31</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1177568</td>
+<td>74</td>
+<td>20</td>
+<td>874</td>
+<td>919</td>
+<td>university-of-bath.wine-society</td>
+<td>31</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">8325228</td>
+<td>0</td>
+<td>5</td>
+<td>13</td>
+<td>13</td>
+<td>jael.patricia-granados-kraulles</td>
+<td>31</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">8796594</td>
+<td>7</td>
+<td>7</td>
+<td>261</td>
+<td>262</td>
+<td>danton-cavalcanti.franco-junior</td>
+<td>31</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">3811532</td>
+<td>1</td>
+<td>0</td>
+<td>36</td>
+<td>38</td>
+<td>marc-antoine.mailloux-labrousse</td>
+<td>31</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">1067813</td>
+<td>5</td>
+<td>5</td>
+<td>64</td>
+<td>64</td>
+<td>b7941e714811716b34fec5f91046cae2</td>
+<td>32</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">6142637</td>
+<td>4</td>
+<td>2</td>
+<td>6</td>
+<td>7</td>
+<td>d0a0d35afcfa00b39219856348c1cb12</td>
+<td>32</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">10306389</td>
+<td>52</td>
+<td>28</td>
+<td>1274</td>
+<td>1303</td>
+<td>m276c28ed28bdf63ac70599392739db6</td>
+<td>32</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">340985</td>
+<td>6</td>
+<td>8</td>
+<td>19</td>
+<td>23</td>
+<td>m4a610a084aeb6643b624f19501e5dbc</td>
+<td>32</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">8049959</td>
+<td>393</td>
+<td>105</td>
+<td>312</td>
+<td>312</td>
+<td>m2210f2e3d21d5f526d8119fae5b94bd</td>
+<td>32</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">1833623</td>
+<td>0</td>
+<td>1</td>
+<td>5</td>
+<td>5</td>
+<td>m9b16842b2ac0920a9bd932d634ae788</td>
+<td>32</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">3694206</td>
+<td>0</td>
+<td>0</td>
+<td>15</td>
+<td>29</td>
+<td>m68f6cf0bd32342dd78045a1f291df1d</td>
+<td>32</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">208288</td>
+<td>0</td>
+<td>0</td>
+<td>25</td>
+<td>32</td>
+<td>c225723314b54f84b589ef58383ba9e8</td>
+<td>32</td>
+</tr>
+<tr class="even">
+<td data-quarto-table-cell-role="th">7033437</td>
+<td>2</td>
+<td>0</td>
+<td>86</td>
+<td>86</td>
+<td>sylvain-est-bon-.il-faut-le-boir</td>
+<td>32</td>
+</tr>
+<tr class="odd">
+<td data-quarto-table-cell-role="th">3228141</td>
+<td>2</td>
+<td>12</td>
+<td>82</td>
+<td>102</td>
+<td>m4fdc413aa3597af25f1fd807f596cca</td>
+<td>32</td>
+</tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>Ah. The 32-char names appear to be hashes. Perhaps they are deleted usernames or bots. It might be a coincidence that the user with 5,000 comments on their reviews has the hash-like username.</p>
+</section>
+</section>
+</section>
+<section id="wine-notes" class="level2">
+<h2 class="anchored" data-anchor-id="wine-notes">Wine Notes</h2>
+<p>Reviewers list the ‘notes’ of wine in their reviews. A nice surprise found in this data is a list of notes identified by Vivino. There are many, many notes.</p>
+<div class="cell" data-execution_count="14">
+<div class="cell-output cell-output-stdout">
+<pre><code>Number of distinct notes: 456</code></pre>
+</div>
+<div class="cell-output cell-output-display">
+<p><img src="index_files/figure-html/cell-27-output-2.png" class="img-fluid"></p>
+</div>
+</div>
+</section>
+</section>
+<section id="next-steps" class="level1">
+<h1>Next Steps</h1>
+<p>My next blogs will be about wine reviews and…</p>
+<ul>
+<li>Bots!</li>
+<li>Reviews with price-sentiment</li>
+<li>Machine learning and sentence transformers</li>
+<li>Unsupervised topic modeling</li>
+</ul>
+<p>Thank you for reaching the end!</p>
+
+
+</section>
+
+
+<div id="quarto-appendix" class="default"><section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes"><h2 class="anchored quarto-appendix-heading">Footnotes</h2>
+
+<ol>
+<li id="fn1"><p>people who think black and white, or 1- and 5-stars only.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn2"><p>because effort<a href="#fnref2" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+<li id="fn3"><p>Vivino needs to use a different word for followings.<a href="#fnref3" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section><section class="quarto-appendix-contents"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{ro2023,
+  author = {Ro, Stephen},
+  title = {31 {Million} {Wine} {Reviews}},
+  date = {2023-07-06},
+  url = {https://royourboat.github.io/posts/2023-07-06-vivino-part1/},
+  langid = {en}
+}
+</code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre><div class="quarto-appendix-secondary-label">For attribution, please cite this work as:</div><div id="ref-ro2023" class="csl-entry quarto-appendix-citeas" role="listitem">
+Ro, Stephen. 2023. <span>“31 Million Wine Reviews.”</span> July 6, 2023.
+<a href="https://royourboat.github.io/posts/2023-07-06-vivino-part1/">https://royourboat.github.io/posts/2023-07-06-vivino-part1/</a>.
+</div></div></section></div></main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const disableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'prefetch';
+    }
+  }
+  const enableStylesheet = (stylesheets) => {
+    for (let i=0; i < stylesheets.length; i++) {
+      const stylesheet = stylesheets[i];
+      stylesheet.rel = 'stylesheet';
+    }
+  }
+  const manageTransitions = (selector, allowTransitions) => {
+    const els = window.document.querySelectorAll(selector);
+    for (let i=0; i < els.length; i++) {
+      const el = els[i];
+      if (allowTransitions) {
+        el.classList.remove('notransition');
+      } else {
+        el.classList.add('notransition');
+      }
+    }
+  }
+  const toggleColorMode = (alternate) => {
+    // Switch the stylesheets
+    const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+    manageTransitions('#quarto-margin-sidebar .nav-link', false);
+    if (alternate) {
+      enableStylesheet(alternateStylesheets);
+      for (const sheetNode of alternateStylesheets) {
+        if (sheetNode.id === "quarto-bootstrap") {
+          toggleBodyColorMode(sheetNode);
+        }
+      }
+    } else {
+      disableStylesheet(alternateStylesheets);
+      toggleBodyColorPrimary();
+    }
+    manageTransitions('#quarto-margin-sidebar .nav-link', true);
+    // Switch the toggles
+    const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+    for (let i=0; i < toggles.length; i++) {
+      const toggle = toggles[i];
+      if (toggle) {
+        if (alternate) {
+          toggle.classList.add("alternate");     
+        } else {
+          toggle.classList.remove("alternate");
+        }
+      }
+    }
+    // Hack to workaround the fact that safari doesn't
+    // properly recolor the scrollbar when toggling (#1455)
+    if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+      manageTransitions("body", false);
+      window.scrollTo(0, 1);
+      setTimeout(() => {
+        window.scrollTo(0, 0);
+        manageTransitions("body", true);
+      }, 40);  
+    }
+  }
+  const isFileUrl = () => { 
+    return window.location.protocol === 'file:';
+  }
+  const hasAlternateSentinel = () => {  
+    let styleSentinel = getColorSchemeSentinel();
+    if (styleSentinel !== null) {
+      return styleSentinel === "alternate";
+    } else {
+      return false;
+    }
+  }
+  const setStyleSentinel = (alternate) => {
+    const value = alternate ? "alternate" : "default";
+    if (!isFileUrl()) {
+      window.localStorage.setItem("quarto-color-scheme", value);
+    } else {
+      localAlternateSentinel = value;
+    }
+  }
+  const getColorSchemeSentinel = () => {
+    if (!isFileUrl()) {
+      const storageValue = window.localStorage.getItem("quarto-color-scheme");
+      return storageValue != null ? storageValue : localAlternateSentinel;
+    } else {
+      return localAlternateSentinel;
+    }
+  }
+  let localAlternateSentinel = 'default';
+  // Dark / light mode switch
+  window.quartoToggleColorScheme = () => {
+    // Read the current dark / light value 
+    let toAlternate = !hasAlternateSentinel();
+    toggleColorMode(toAlternate);
+    setStyleSentinel(toAlternate);
+  };
+  // Ensure there is a toggle, if there isn't float one in the top right
+  if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+    const a = window.document.createElement('a');
+    a.classList.add('top-right');
+    a.classList.add('quarto-color-scheme-toggle');
+    a.href = "";
+    a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+    const i = window.document.createElement("i");
+    i.classList.add('bi');
+    a.appendChild(i);
+    window.document.body.appendChild(a);
+  }
+  // Switch to dark mode if need be
+  if (hasAlternateSentinel()) {
+    toggleColorMode(true);
+  } else {
+    toggleColorMode(false);
+  }
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const isCodeAnnotation = (el) => {
+    for (const clz of el.classList) {
+      if (clz.startsWith('code-annotation-')) {                     
+        return true;
+      }
+    }
+    return false;
+  }
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    text: function(trigger) {
+      const codeEl = trigger.previousElementSibling.cloneNode(true);
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+      let selectedAnnoteEl;
+      const selectorForAnnotation = ( cell, annotation) => {
+        let cellAttr = 'data-code-cell="' + cell + '"';
+        let lineAttr = 'data-code-annotation="' +  annotation + '"';
+        const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+        return selector;
+      }
+      const selectCodeLines = (annoteEl) => {
+        const doc = window.document;
+        const targetCell = annoteEl.getAttribute("data-target-cell");
+        const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+        const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+        const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+        const lineIds = lines.map((line) => {
+          return targetCell + "-" + line;
+        })
+        let top = null;
+        let height = null;
+        let parent = null;
+        if (lineIds.length > 0) {
+            //compute the position of the single el (top and bottom and make a div)
+            const el = window.document.getElementById(lineIds[0]);
+            top = el.offsetTop;
+            height = el.offsetHeight;
+            parent = el.parentElement.parentElement;
+          if (lineIds.length > 1) {
+            const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+            const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+            height = bottom - top;
+          }
+          if (top !== null && height !== null && parent !== null) {
+            // cook up a div (if necessary) and position it 
+            let div = window.document.getElementById("code-annotation-line-highlight");
+            if (div === null) {
+              div = window.document.createElement("div");
+              div.setAttribute("id", "code-annotation-line-highlight");
+              div.style.position = 'absolute';
+              parent.appendChild(div);
+            }
+            div.style.top = top - 2 + "px";
+            div.style.height = height + 4 + "px";
+            let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+            if (gutterDiv === null) {
+              gutterDiv = window.document.createElement("div");
+              gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+              gutterDiv.style.position = 'absolute';
+              const codeCell = window.document.getElementById(targetCell);
+              const gutter = codeCell.querySelector('.code-annotation-gutter');
+              gutter.appendChild(gutterDiv);
+            }
+            gutterDiv.style.top = top - 2 + "px";
+            gutterDiv.style.height = height + 4 + "px";
+          }
+          selectedAnnoteEl = annoteEl;
+        }
+      };
+      const unselectCodeLines = () => {
+        const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+        elementsIds.forEach((elId) => {
+          const div = window.document.getElementById(elId);
+          if (div) {
+            div.remove();
+          }
+        });
+        selectedAnnoteEl = undefined;
+      };
+      // Attach click handler to the DT
+      const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+      for (const annoteDlNode of annoteDls) {
+        annoteDlNode.addEventListener('click', (event) => {
+          const clickedEl = event.target;
+          if (clickedEl !== selectedAnnoteEl) {
+            unselectCodeLines();
+            const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+            if (activeEl) {
+              activeEl.classList.remove('code-annotation-active');
+            }
+            selectCodeLines(clickedEl);
+            clickedEl.classList.add('code-annotation-active');
+          } else {
+            // Unselect the line
+            unselectCodeLines();
+            clickedEl.classList.remove('code-annotation-active');
+          }
+        });
+      }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>

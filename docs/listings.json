@@ -2,6 +2,9 @@
   {
     "listing": "/posts.html",
     "items": [
+      "/posts/2023-07-11-price-sentiment-2/index.html",
+      "/posts/2023-07-10-price-sentiment/index.html",
+      "/posts/2023-07-06-vivino-part1/index.html",
       "/posts/2023-07-01-lcbo-psql/index.html",
       "/posts/2023-06-22-lcbo-github-actions-bot/index.html",
       "/posts/2023-06-17-lcbo-scraper/index.html",

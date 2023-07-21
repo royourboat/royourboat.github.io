@@ -208,8 +208,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
    
   <ul>
   <li><a href="#what-is-the-lcbo" id="toc-what-is-the-lcbo" class="nav-link active" data-scroll-target="#what-is-the-lcbo">What is the LCBO?</a></li>
-  <li><a href="#what-is-the-data" id="toc-what-is-the-data" class="nav-link" data-scroll-target="#what-is-the-data">What is the data</a></li>
-  <li><a href="#why-i-need-the-store-information" id="toc-why-i-need-the-store-information" class="nav-link" data-scroll-target="#why-i-need-the-store-information">Why I need the store information</a>
+  <li><a href="#what-is-the-data" id="toc-what-is-the-data" class="nav-link" data-scroll-target="#what-is-the-data">What is the data</a>
   <ul class="collapse">
   <li><a href="#data-product-store-information" id="toc-data-product-store-information" class="nav-link" data-scroll-target="#data-product-store-information">Data Product: Store Information</a>
   <ul class="collapse">
@@ -236,11 +235,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h1>What is the data</h1>
 <p>The <a href="lcbo.com">LCBO</a> website publishes the live inventory of every product available across their nearly 700 retail stores. I asked a retail operator how accurate the website’s inventory is and they said “well, our staff use it to know what we have.”</p>
 <p>There are three sets of data I am interested in: product descriptions, product inventory, and store information. Below, I will show how I made a simple scraping function to scrape store information. My next blog posts will be on product descriptions and inventory, which require a few more steps.</p>
-</section>
-<section id="why-i-need-the-store-information" class="level1">
-<h1>Why I need the store information</h1>
-<p>The LCBO webpage has an aggressive overlay that asks permission for your location to find the nearest store to you. It always leaves a bad taste in my mouth. The overlay feels clunky, stuttery, and assumes the nearest LCBO to me is where I’ll be shopping. Not true!</p>
-<p>A feature I want my app, OVINO, to have is to identify the LCBO store nearest to the address you provide. This feature requires the geographic locations of all the LCBO stores.</p>
 <section id="data-product-store-information" class="level2">
 <h2 class="anchored" data-anchor-id="data-product-store-information">Data Product: Store Information</h2>
 <section id="part-1-finding-the-data" class="level3">
@@ -262,11 +256,11 @@ https://www.lcbo.com/en/stores/queens-quay-cooper-street-217
 </div>
 </div>
 </div>
-<p>Open the webpage on your browser: <a href="https://www.lcbo.com/en/stores/queens-quay-cooper-street-217">https://www.lcbo.com/en/stores/queens-quay-cooper-street-217</a></p>
-<p>When clicking the above link, you sent a large array of requests for instructions about the website layout, fonts, colours, images, and text. We can monitor this traffic of information and try to find where the store information is. Often times, the store information (or any data) is sent to your browser in the form of a JSON file, which is the case here!</p>
-<p>On the webpage, do the following :</p>
+<p><a href="https://www.lcbo.com/en/stores/queens-quay-cooper-street-217">https://www.lcbo.com/en/stores/queens-quay-cooper-street-217</a></p>
+<p>When clicking the above link, we can monitor the traffic of information arriving to your browser and search for the store information. Often times, its sent as a JSON file.</p>
+<p>To find the JSON, do the following:</p>
 <ol type="1">
-<li>Right-Click on an empty space</li>
+<li>Right-Click on the page</li>
 <li>Click Inspect</li>
 <li>Select the “Network” tab</li>
 <li>Select the “XHR” sub-tab (on Chrome it is “Fetch/XHR”)</li>
@@ -294,13 +288,13 @@ Store Information (JSON)
 </div>
 </div>
 </div>
-<p>Click a row in the table with JSON file types. You will see the contents of the JSON file beneath the “Response” sub-tab. Keep clicking until you find the store information.</p>
-<p>Congratulations! You’ve found the data. It contains the store address, longitude and latitude, city, area (zip) code, phone number, URL, store hours, and store ID. When I first found the data, I was not expecting the longitude and latitude to be available. So, it was a nice feature that I can use right away for my app. You’ll be surprised what unexpected features there might be when you collect data elsewhere with this technique!</p>
+<p>Click on a table row JSON file type. You will see the contents of the JSON file beneath the “Response” sub-tab. Keep clicking until you find the store information.</p>
+<p>Congratulations! You’ve found the data. It contains the store address, longitude and latitude, city, area (zip) code, phone number, URL, store hours, and store ID.</p>
 <p>Now lets grab it.</p>
 </section>
 <section id="part-2-requesting-the-data" class="level3">
 <h3 class="anchored" data-anchor-id="part-2-requesting-the-data">Part 2: Requesting the data</h3>
-<p>cURL is a command line tool used to transfer data. It was made by a <a href="https://en.wikipedia.org/wiki/CURL">dev who wanted to automatically fetch currency exchange rates</a>! We can get the cURL command to obtain the data product easily by</p>
+<p>cURL is a command line tool used to transfer data. It was made by a <a href="https://en.wikipedia.org/wiki/CURL">dev who wanted to automatically fetch currency exchange rates</a>! We use the cURL command by…</p>
 <ol type="1">
 <li>Right-clicking on the row with the data product</li>
 <li>Select “Copy Value”</li>
@@ -322,7 +316,7 @@ cURL command location
 </div>
 </div>
 </div>
-<p>The cURL command is now on your clipboard. If you paste the cURL command into an editor, you’ll find a wall of intimidating text. To better understand this, I found <a href="https://web.postman.co/">Postman</a> incredibly useful. Make a free account, agree to things, and you’ll arrive at a workspace. Click on “Import” in the top-left (see note below).</p>
+<p>The cURL command is now on your clipboard. If you paste the cURL command into an editor, you’ll find a wall of intimidating text. I found <a href="https://web.postman.co/">Postman</a> incredibly useful to parse the text. Make a free account, agree to things, and you’ll arrive at a workspace. Click on “Import” in the top-left (see note below).</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-4-contents" aria-controls="callout-4" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
@@ -339,7 +333,7 @@ Postman - Import button
 </div>
 </div>
 </div>
-<p>A little window will pop up. Paste the cURL command you obtained earlier and Postman will automatically prepare the workspace. Click the blue button “Send” to execute the cURL command. You’ll find the JSON displayed at the bottom. Next, select the “Header” tab and then select the code snippet button “&lt;/&gt;” on the very right margin. See image below.</p>
+<p>A little window will pop up. Paste the copied cURL command and Postman will automatically setup a workspace. Click the blue button “Send” to execute the cURL command. The JSON is retrieved and displayed at the bottom. Next, select the “Header” tab and then select the code snippet button “&lt;/&gt;” on the very right margin. See image below.</p>
 <div class="callout callout-style-default callout-note callout-titled">
 <div class="callout-header d-flex align-content-center" data-bs-toggle="collapse" data-bs-target=".callout-5-contents" aria-controls="callout-5" aria-expanded="false" aria-label="Toggle callout">
 <div class="callout-icon-container">
@@ -425,10 +419,17 @@ Scrape gently
 </section>
 <section id="next-steps" class="level1">
 <h1>Next Steps</h1>
-<p>There are two directions I will go from here. The first is how to scrape the other remaining data products. The second is how to Git scrape (i.e., scrape automatically) these data products.</p>
-<p>If you’re interested in Git scraping, check out Simon Willison’s <a href="https://simonwillison.net/2021/Mar/5/git-scraping/">amazing blog post</a>. I learn a lot from Simon and will be fashioning his Git scraping guide for the LCBO data.</p>
+<p>Check out the next posts below where I collect the remaining data manually and with my scraper bot.</p>
+<ul>
+<li>Scraping LCBO Data (Part 2: Product Inventory): <a href="../2023-06-10-lcbo-scraper/">link</a></li>
+<li>Scraping LCBO Data (Part 3: Product Descriptions) : <a href="../2023-06-17-lcbo-scraper/">link</a></li>
+<li>Making my own scraper bot! <a href="../2023-06-22-lcbo-github-actions-bot/">link</a></li>
+</ul>
+<section id="thanks-for-reading" class="level4">
+<h4 class="anchored" data-anchor-id="thanks-for-reading">Thanks for reading!</h4>
 
 
+</section>
 </section>
 
 
