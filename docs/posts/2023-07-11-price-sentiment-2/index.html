@@ -258,7 +258,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h1>Feature Engineering</h1>
 <section id="training-data" class="level2">
 <h2 class="anchored" data-anchor-id="training-data">Training Data</h2>
-<p><img src="index_files/figure-html/3b5e9d1a-1-2c75e76dad7c1e5ed7664841b6da7f29-1.png" class="img-fluid"></p>
+<p><img src="index_files/figure-html/7e9078d0-1-2c75e76dad7c1e5ed7664841b6da7f29-1.png" class="img-fluid"></p>
 <section id="read-and-re-label-data" class="level4">
 <h4 class="anchored" data-anchor-id="read-and-re-label-data">1. Read and re-label data</h4>
 <div class="cell" data-execution_count="2">
@@ -288,7 +288,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h4 class="anchored" data-anchor-id="rescale-star-ratings-since-many-models-require-feature-scaling">2. Rescale star-ratings since many models require feature scaling</h4>
 <div class="quarto-figure quarto-figure-left">
 <figure class="figure">
-<p><img src="index_files/figure-html/5ad511ab-1-71a9318aa9f51c6f637560690ff9c9df.png" class="img-fluid figure-img"></p>
+<p><img src="index_files/figure-html/7cc3ee20-1-71a9318aa9f51c6f637560690ff9c9df.png" class="img-fluid figure-img"></p>
 </figure>
 </div>
 <div class="cell" data-execution_count="14">
@@ -300,7 +300,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Here is a log-histogram of word frequency per review that I made in this <a href="../2023-07-06-vivino-part1/">post</a>. The number of words per review cannot exceed a threshold since (a) the character limit per review is 520, and (b) the average characters per word is 4.79 (or 5.79 if you include a white space). This threshold is 520 / 5.79 ~ 90, which is approximately where the knee of the distribution is.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="index_files/figure-html/ae706f19-1-fig-words-output-1.png" class="img-fluid figure-img"></p>
+<p><img src="index_files/figure-html/b9806ab7-1-fig-words-output-1.png" class="img-fluid figure-img"></p>
 <figcaption class="figure-caption">fig-words-output-1.png</figcaption>
 </figure>
 </div>
@@ -409,7 +409,7 @@ See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stab
 </section>
 <section id="word-significance-bag-of-words-with-tf-idf-vectorizer" class="level4">
 <h4 class="anchored" data-anchor-id="word-significance-bag-of-words-with-tf-idf-vectorizer">5. Word significance: bag of words with TF-IDF vectorizer</h4>
-<p><img src="index_files/figure-html/1b82a44f-1-c417210e4d54432ef548205c26db360f.png" class="img-fluid"></p>
+<p><img src="index_files/figure-html/8cdb15b7-1-c417210e4d54432ef548205c26db360f.png" class="img-fluid"></p>
 <p>Next, I define a TF-IDF vectorizer.</p>
 <div class="cell" data-execution_count="32">
 <div class="sourceCode cell-code" id="cb7"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.compose <span class="im">import</span> ColumnTransformer</span>
@@ -432,7 +432,7 @@ See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stab
 </section>
 <section id="sentence-abstraction-transform-reviews-into-sentence-embeddings" class="level4">
 <h4 class="anchored" data-anchor-id="sentence-abstraction-transform-reviews-into-sentence-embeddings">6. Sentence abstraction: transform reviews into sentence embeddings</h4>
-<p><img src="index_files/figure-html/ac0179b7-1-6d709a2840c9d600402773950fc3e321.png" class="img-fluid"></p>
+<p><img src="index_files/figure-html/845c3cf1-1-6d709a2840c9d600402773950fc3e321.png" class="img-fluid"></p>
 <p>Here is a (scikit-learn) transformer that creates embeddings using the sentence transformer.</p>
 <div class="cell" data-execution_count="33">
 <div class="sourceCode cell-code" id="cb8"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sentence_transformers <span class="im">import</span> SentenceTransformer</span>
@@ -466,7 +466,7 @@ See the caveats in the documentation: https://pandas.pydata.org/pandas-docs/stab
 </section>
 <section id="combine-engineered-features" class="level4">
 <h4 class="anchored" data-anchor-id="combine-engineered-features">7. Combine engineered features</h4>
-<p><img src="index_files/figure-html/66b331fc-1-2fd31c7655decf54bf7d520c5f9e54e2.png" class="img-fluid"></p>
+<p><img src="index_files/figure-html/96d2b0cd-1-2fd31c7655decf54bf7d520c5f9e54e2.png" class="img-fluid"></p>
 <p>Finally, I create a column transformer that plucks the data columns we want and applies various transformers to them. The outputs of each transformer are merged back together into a large (semi-)sparse matrix.</p>
 <div class="cell" data-execution_count="34">
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> sklearn.base <span class="im">import</span> BaseEstimator, TransformerMixin</span>
@@ -817,27 +817,27 @@ Testing set shape: (775, 28436)</code></pre>
 <p>Here are the ROC and PR curves for each model. The code to fit these models are further below.</p>
 <section id="logistic-regression" class="level2">
 <h2 class="anchored" data-anchor-id="logistic-regression">1. Logistic Regression</h2>
-<p><img src="index_files/figure-html/e51f6595-1-LogisticRegression.png" class="img-fluid"></p>
+<p><img src="index_files/figure-html/f8aee5f4-1-LogisticRegression.png" class="img-fluid"></p>
 </section>
 <section id="complement-naive-bayes" class="level2">
 <h2 class="anchored" data-anchor-id="complement-naive-bayes">2. Complement Naive Bayes</h2>
-<p><img src="index_files/figure-html/a9439323-1-CNB.png" class="img-fluid"></p>
+<p><img src="index_files/figure-html/76ad8901-1-CNB.png" class="img-fluid"></p>
 </section>
 <section id="support-vector-machine" class="level2">
 <h2 class="anchored" data-anchor-id="support-vector-machine">3. Support Vector Machine</h2>
-<p><img src="index_files/figure-html/d624554b-1-SVC.png" class="img-fluid"></p>
+<p><img src="index_files/figure-html/c1d995f0-1-SVC.png" class="img-fluid"></p>
 </section>
 <section id="random-forest-classifier" class="level2">
 <h2 class="anchored" data-anchor-id="random-forest-classifier">4. Random Forest Classifier</h2>
-<p><img src="index_files/figure-html/57908c25-1-RFC.png" class="img-fluid"></p>
+<p><img src="index_files/figure-html/6716b3c5-1-RFC.png" class="img-fluid"></p>
 </section>
 <section id="xgboost-winner" class="level2">
 <h2 class="anchored" data-anchor-id="xgboost-winner">5. XGBoost (Winner!)</h2>
-<p><img src="index_files/figure-html/75c4711d-1-XGBC.png" class="img-fluid"></p>
+<p><img src="index_files/figure-html/a3f2957c-1-XGBC.png" class="img-fluid"></p>
 </section>
 <section id="lightgbm" class="level2">
 <h2 class="anchored" data-anchor-id="lightgbm">6. LightGBM</h2>
-<p><img src="index_files/figure-html/31709aee-1-LGBM.png" class="img-fluid"></p>
+<p><img src="index_files/figure-html/7518dc55-1-LGBM.png" class="img-fluid"></p>
 </section>
 </section>
 <section id="model-training-code" class="level1">

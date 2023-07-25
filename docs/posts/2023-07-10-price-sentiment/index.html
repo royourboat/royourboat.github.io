@@ -8,7 +8,7 @@
 
 <meta name="author" content="Stephen Ro">
 <meta name="dcterms.date" content="2023-07-10">
-<meta name="description" content="Is $20 a good price for this bottle? No!">
+<meta name="description" content="Is $20 a good price for this bottle?">
 
 <title>Stephen Ro - Judging Wine Prices: Training Data (Part 1)</title>
 <style>
@@ -135,7 +135,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  <span class="menu-text">Blog</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../../resume/stephen_ro_resume.pdf" rel="" target="">
+    <a class="nav-link" href="../../resume/Stephen_Ro_Resume.pdf" rel="" target="">
  <span class="menu-text">Resume</span></a>
   </li>  
   <li class="nav-item compact">
@@ -168,12 +168,14 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <h1 class="title">Judging Wine Prices: Training Data (Part 1)</h1>
                   <div>
         <div class="description">
-          Is $20 a good price for this bottle? No!
+          Is $20 a good price for this bottle?
         </div>
       </div>
                           <div class="quarto-categories">
                 <div class="quarto-category">Python</div>
                 <div class="quarto-category">JSON</div>
+                <div class="quarto-category">BERT</div>
+                <div class="quarto-category">NLP</div>
               </div>
                   </div>
   </div>
@@ -242,7 +244,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h1>Motivation</h1>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="index_files/figure-html/fbebe72d-1-BeFunky-collage-21.jpg" class="img-fluid figure-img"></p>
+<p><img src="index_files/figure-html/34666488-1-BeFunky-collage-21.jpg" class="img-fluid figure-img"></p>
 <figcaption class="figure-caption">Image by LCBO</figcaption>
 </figure>
 </div>
@@ -255,7 +257,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>An incredibly popular wine app, Vivino, is great at identifying wines using their image recognition software. But, I’m not going to stand around all day taking pictures of wine. It is good at filtering out which bottles have under 4-stars. But, I would also like a good deal after my expensive experience.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="index_files/figure-html/95a45f4d-1-1200x800.jpg" class="img-fluid figure-img"></p>
+<p><img src="index_files/figure-html/3e6c0fa5-1-1200x800.jpg" class="img-fluid figure-img"></p>
 <figcaption class="figure-caption">Image recognition feature on the Vivino app. Image by David Silverman/Getty Images</figcaption>
 </figure>
 </div>
@@ -267,7 +269,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>I noticed about 0.5% (~1 in 200) of reviews on Vivino contain (1) the price a user paid, and (2) the sentiment for that price. Samples of reviews with “price-sentiment” are shown in the diagram below.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="index_files/figure-html/76beeb82-1-price_sentiment_diagram.png" class="img-fluid figure-img"></p>
+<p><img src="index_files/figure-html/ae4ca207-1-price_sentiment_diagram.png" class="img-fluid figure-img"></p>
 <figcaption class="figure-caption">price_sentiment_diagram.png</figcaption>
 </figure>
 </div>
@@ -517,7 +519,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>Its no surprise that price-sentiments and star ratings are correlated. It is surprising to see the neutral sentiments resting distinctly between 2- and 4-stars with small tails. This supports the neutral category being a real third category in sentiment analysis, and it is nearly equal in proportion to the negative sentiments.</p>
 <p>Selecting 1- and 5-star reviews as proxies for negative and positive sentiment appears reasonable after considering the relative contributions from each sentiment per rating. The ratio of positive-to-negative sentiments above 4.5 stars is 26-to-1. The ratio of negative-to-positive sentiments below 1.5 stars is 14-to-1. This suggests approximating the price-sentiment with the star rating may be viable.</p>
 <p>The figure below shows “Don’t know” sentiments lean towards higher star-ratings. This suggests there may be more “Don’t knows” will be falsely predicted as positive than negative. This is a better than the opposite considering how the neutral and negative sentiments are a minority class.</p>
-<div class="cell" data-execution_count="8">
+<div class="cell" data-execution_count="9">
 <div class="cell-output cell-output-display">
 <p><img src="index_files/figure-html/cell-9-output-1.png" class="img-fluid"></p>
 </div>
@@ -596,7 +598,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <li>Bag of Words: Quantify significance of terms using TF-IDF.</li>
 <li>Sentence-Transformers: Extract meaning or intent underlying the text.</li>
 </ol>
-<p><img src="index_files/figure-html/5fd7a3a9-1-e82800246289a497612101a3680045da.png" class="img-fluid"></p>
+<p><img src="index_files/figure-html/39d8ba6e-1-e82800246289a497612101a3680045da.png" class="img-fluid"></p>
 <section id="nlp-strategies" class="level2">
 <h2 class="anchored" data-anchor-id="nlp-strategies">NLP Strategies</h2>
 <p>My price-sentiment labels capture two different ideas:</p>

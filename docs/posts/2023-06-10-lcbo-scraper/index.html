@@ -133,7 +133,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  <span class="menu-text">Blog</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../../resume/stephen_ro_resume.pdf" rel="" target="">
+    <a class="nav-link" href="../../resume/Stephen_Ro_Resume.pdf" rel="" target="">
  <span class="menu-text">Resume</span></a>
   </li>  
   <li class="nav-item compact">
@@ -219,7 +219,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   </ul></li>
   <li><a href="#loop-the-script-for-each-sku-number" id="toc-loop-the-script-for-each-sku-number" class="nav-link" data-scroll-target="#loop-the-script-for-each-sku-number">Loop the script for each SKU number:</a></li>
   </ul></li>
-  <li><a href="#conclusion" id="toc-conclusion" class="nav-link" data-scroll-target="#conclusion">Conclusion</a></li>
+  <li><a href="#next-steps" id="toc-next-steps" class="nav-link" data-scroll-target="#next-steps">Next Steps</a></li>
   </ul>
 </nav>
     </div>
@@ -442,11 +442,15 @@ Store Inventory JSON - We want line 4004!
 <span id="cb29-12"><a href="#cb29-12" aria-hidden="true" tabindex="-1"></a><span class="cf">done</span> <span class="op">&lt;</span> json/nonwine_sku_list.txt</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </section>
 </section>
-<section id="conclusion" class="level1">
-<h1>Conclusion</h1>
-<p>I made a surprising discovery when directly webscraping the HTML code. The HTML code delivered via the cURL command contained the inventory table as a JSON in text format. This let us write a few lines of code to extract the data. If this were not the case, I would have either written dozens of regex code or generated a browser in python to download the blob URL. Fortunately, I found a cleaner solution!</p>
+<section id="next-steps" class="level1">
+<h1>Next Steps</h1>
+<p>The last data retrieval is product information which is <a href="../2023-06-17-lcbo-scraper/">part 3</a> of the series. This was the hardest to wrangle!</p>
+<p>Once all of the scrapers were nailed down, I wrote a scraper bot that does it for me periodically. The bot also updates my PostgreSQL data base! Everything is automated and hands free. Check out <a href="2023-06-22-lcbo-github-actions-bot/">this post</a> to learn how to write one!</p>
+<section id="thanks-for-reading" class="level4">
+<h4 class="anchored" data-anchor-id="thanks-for-reading">Thanks for reading!</h4>
 
 
+</section>
 </section>
 
 <div id="quarto-appendix" class="default"><section class="quarto-appendix-contents"><h2 class="anchored quarto-appendix-heading">Citation</h2><div><div class="quarto-appendix-secondary-label">BibTeX citation:</div><pre class="sourceCode code-with-copy quarto-appendix-bibtex"><code class="sourceCode bibtex">@online{ro2023,

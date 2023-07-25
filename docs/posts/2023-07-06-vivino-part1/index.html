@@ -8,7 +8,7 @@
 
 <meta name="author" content="Stephen Ro">
 <meta name="dcterms.date" content="2023-07-06">
-<meta name="description" content="A peek into a LOT of reviews with NLP tools.">
+<meta name="description" content="I scraped a LOT of reviews. Found neat distributions and bizarre reviewers.">
 
 <title>Stephen Ro - 31 Million Wine Reviews</title>
 <style>
@@ -136,7 +136,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
  <span class="menu-text">Blog</span></a>
   </li>  
   <li class="nav-item">
-    <a class="nav-link" href="../../resume/stephen_ro_resume.pdf" rel="" target="">
+    <a class="nav-link" href="../../resume/Stephen_Ro_Resume.pdf" rel="" target="">
  <span class="menu-text">Resume</span></a>
   </li>  
   <li class="nav-item compact">
@@ -169,7 +169,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
       <h1 class="title">31 Million Wine Reviews</h1>
                   <div>
         <div class="description">
-          A peek into a LOT of reviews with NLP tools.
+          I scraped a LOT of reviews. Found neat distributions and bizarre reviewers.
         </div>
       </div>
                           <div class="quarto-categories">
@@ -243,7 +243,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <p>I noticed approximately 0.5% (~1 in 200) of reviews contain the price a user paid and their sentiment for that price. An example of reviews with “price-sentiment” are shown in the diagram below.</p>
 <div class="quarto-figure quarto-figure-center">
 <figure class="figure">
-<p><img src="index_files/figure-html/1f5b4ae3-1-price_sentiment_diagram.png" class="img-fluid figure-img"></p>
+<p><img src="index_files/figure-html/5991a2e8-1-price_sentiment_diagram.png" class="img-fluid figure-img"></p>
 <figcaption class="figure-caption">An overview of my price-sentiment algorithm.</figcaption>
 </figure>
 </div>
@@ -265,7 +265,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <h1>The Reviews</h1>
 <section id="header" class="level2">
 <h2 class="anchored" data-anchor-id="header">1. Header</h2>
-<div class="cell" data-execution_count="3">
+<div class="cell" data-execution_count="6">
 <details>
 <summary>Code: get number of reviews</summary>
 <div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pandas <span class="im">as</span> pd</span>
@@ -387,8 +387,8 @@ Total number of wines: 49517</code></pre>
 <h2 class="anchored" data-anchor-id="ratings">2. Ratings</h2>
 <section id="all-ratings-with-reviews" class="level4">
 <h4 class="anchored" data-anchor-id="all-ratings-with-reviews">All ratings (with reviews)</h4>
-<p>Here is a histogram of all star ratings. Most users vote in 0.5 increments (e.g., 3.5, 4.0, 4.5) rather than the finest 0.1 increments.</p>
-<div class="cell" data-execution_count="68">
+<p>Here is a histogram of all star ratings. Most votes are in 0.5 increments (e.g., 3.5, 4.0, 4.5). <strong>This is because the app had permitted users to only rate in 0.5-star increments.</strong></p>
+<div class="cell" data-execution_count="4">
 <details>
 <summary>Code: get SQL table and plot ratings</summary>
 <div class="sourceCode cell-code" id="cb6"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> matplotlib.pyplot <span class="im">as</span> plt</span>
@@ -458,7 +458,7 @@ Total number of wines: 49517</code></pre>
 <section id="average-rating-per-wine" class="level4">
 <h4 class="anchored" data-anchor-id="average-rating-per-wine">Average Rating per Wine</h4>
 <p>The distribution of the average rating per wine shows a nice demonstration of the Central Limit Theorem.</p>
-<div class="cell" data-execution_count="13">
+<div class="cell" data-execution_count="7">
 <details>
 <summary>Code: plot histogram of average rating per wine</summary>
 <div class="sourceCode cell-code" id="cb9"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> scipy.optimize <span class="im">import</span> curve_fit</span>
@@ -925,9 +925,9 @@ Good persistency with licorice notes.
 </div>
 </div>
 <p>Weird! It looks like <strong>m58cb20b86fe892ae6f5543f9e9b2c8c</strong> is a bot or experiment. Their <a href="https://www.vivino.com/users/m58cb20b86fe892ae6f5543f9e9b2c8c">profile</a> shows some reviews with over 5,000 comments and zero likes. Here are comments for one of them:</p>
-<p><img src="index_files/figure-html/a7d6b369-1-650d2dd0b8af578397c2e3047fb1da9f.png" class="img-fluid"></p>
+<p><img src="index_files/figure-html/e8b791ef-1-650d2dd0b8af578397c2e3047fb1da9f.png" class="img-fluid"></p>
 <p>User <a href="https://www.vivino.com/users/ademar.ju"><strong>ademar.ju</strong></a> has reviewed 24 bottles which have single-digit likes, hundreds of comments each, all of which are written by <strong>Leonel de Paula</strong>. <a href="https://www.vivino.com/users/leonel.de-paula">Leonel de Paula</a> also comments on their own wine reviews with emojis, and tags other users.</p>
-<p><img src="index_files/figure-html/3dce2a89-1-7501fe45aaa6a3470dd040b4e28dd1c4.png" class="img-fluid"></p>
+<p><img src="index_files/figure-html/2772bdb5-1-7501fe45aaa6a3470dd040b4e28dd1c4.png" class="img-fluid"></p>
 <p>Some users like <strong><a href="https://www.vivino.com/users/kelley_do">kelley_do</a></strong> and <strong><a href="https://www.vivino.com/users/scorewine">scorewine</a></strong> appear to be real people with strong passions for wine.</p>
 <p>There is a lot more I can say about these bots on Vivino that I will say in my next blog post. For now, I do not find any reviews from suspected bots with prices in them. This suggests that my work on price-sentiments is unlikely to suffer from bots generating fake reviews.</p>
 </section>
@@ -1100,7 +1100,7 @@ Good persistency with licorice notes.
 <p><img src="index_files/figure-html/cell-25-output-1.png" class="img-fluid"></p>
 </div>
 </div>
-<p>Woah! I wasn’t expecting a sizable number of users have the max length for usernames. To be fair, I’ve never asked myself that before. Let’s take a look at some of the names.</p>
+<p>Woah! I wasn’t expecting a sizable number of users have the max length for usernames. Let’s take a look at some of the names.</p>
 <div class="cell" data-execution_count="235">
 <div class="cell-output cell-output-display" data-execution_count="235">
 <div>
@@ -1260,7 +1260,7 @@ Good persistency with licorice notes.
 </div>
 </div>
 </div>
-<p>Ah. The 32-char names appear to be hashes. Perhaps they are deleted usernames or bots. It might be a coincidence that the user with 5,000 comments on their reviews has the hash-like username.</p>
+<p>Ah. The 32-char names appear to be hashes. Some of these accounts appear legitimate. The backgrounds in their photos of wine appear to be the same environment for some users. It seems like a coincidence that the user with 5,000 comments on their reviews has the hash-like username.</p>
 </section>
 </section>
 </section>
