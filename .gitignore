@@ -11,4 +11,10 @@
 !docs/*/*/*/*/*
 !docs/*/*/*/*/*/*
 
+
+
 /.quarto/
+
+docs/posts/ml_interview_questions/index.html
+posts/ml_interview_questions/*
+
